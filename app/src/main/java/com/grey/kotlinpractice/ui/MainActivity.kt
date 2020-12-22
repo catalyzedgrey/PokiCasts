@@ -15,10 +15,7 @@ import java.util.logging.Logger
 
 class MainActivity : AppCompatActivity() {
 
-    lateinit var viewModel: HomeViewModel
-
     lateinit var binding: ActivityMainBinding
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,7 +30,6 @@ class MainActivity : AppCompatActivity() {
                 .replace(R.id.container, fragment, fragment.javaClass.getSimpleName()).commit()
         }
 
-        //viewModel = ViewM
 
         var bottomNavigationView = view.bottomNavigationView
         bottomNavigationView.setOnNavigationItemSelectedListener {

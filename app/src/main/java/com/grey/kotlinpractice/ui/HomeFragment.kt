@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.adapter.CustomGridAdapter
+import com.grey.kotlinpractice.adapter.SearchAdapter
 import com.grey.kotlinpractice.data.Model
 
 class HomeFragment : Fragment() {
@@ -27,17 +28,7 @@ class HomeFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         homeViewModel = HomeViewModel()
-
-        val gridObserver = Observer<Model.Results> { result ->
-            // Update the UI
-            Log.v("changing UI", "changing UI--------")
-            adapter.updateList(result.results)
-            recyclerView.adapter = adapter
-        }
-        homeViewModel.data.observe(viewLifecycleOwner, gridObserver)
-
         return inflater.inflate(R.layout.fragment_home, container, false)
     }
 
@@ -51,17 +42,13 @@ class HomeFragment : Fragment() {
         recyclerView.adapter = adapter
 
 
-        //homeViewModel.result.observe(viewLifecycleOwner)
-//        homeViewModel.result.observe(viewLifecycleOwner) {
-//            // update UI
-//        }
-
-        val resultObserver = Observer<Model.Results> { newResult ->
-            // Update the UI, in this case, a TextView.
-
+        val gridObserver = Observer<Model.Results> { result ->
+            // Update the UI
+            Log.v("changing UI", "changing UI--------")
+            adapter.updateList(result.results)
+            recyclerView.adapter = adapter
         }
-
-        //homeViewModel.result.observe(viewLifecycleOwner, resultObserver)
+        homeViewModel.data.observe(viewLifecycleOwner, gridObserver)
 
 
     }

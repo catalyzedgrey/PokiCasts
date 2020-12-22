@@ -16,19 +16,8 @@ class CustomGridAdapter(
 ) : RecyclerView.Adapter<CustomGridAdapter.MyViewHolder>() {
 
     class MyViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
-        val podIcon: ImageView
-
-        init {
-            podIcon = view.findViewById(R.id.icon)
-        }
-
+        val podIcon: ImageView = view.findViewById(R.id.icon)
     }
-
-//    override fun getCount(): Int {
-//        return allResults.count(); }
-
-//    override fun getItem(position: Int): Any {
-//        return position.toLong(); }
 
     override fun getItemId(position: Int): Long {
         return position.toLong()
@@ -39,24 +28,13 @@ class CustomGridAdapter(
         notifyDataSetChanged()
     }
 
-//    override fun getView(position: Int, view: View?, viewGroup: ViewGroup?): View {
-//        val layoutInflater: LayoutInflater = LayoutInflater.from(context);
-//        val mainRow: View = layoutInflater.inflate(R.layout.list_item, viewGroup, false);
-//
-//        val podcastName: TextView = mainRow.findViewById<TextView>(R.id.textView);
-//        podcastName.text = allResults[position].artistName;
-//
-//        val podcastIcon: ImageView = mainRow.findViewById(R.id.icon)
-//
-//        val url: String = allResults[position].artworkUrl100!!
-//        Picasso.get().load(url).into(podcastIcon)
-//
-//        return mainRow;
-//    }
 
     //Create new views
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.home_list_item, parent, false)
+        view.setOnClickListener(View.OnClickListener {
+            //TODO
+        })
         return MyViewHolder(view)
     }
 
