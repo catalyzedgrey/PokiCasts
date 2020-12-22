@@ -19,11 +19,11 @@ object Model {
 
         @SerializedName("trackCount")
         @Expose
-        private val trackCount: Int? = null
+        public val trackCount: Int? = null
 
         @SerializedName("collectionName")
         @Expose
-        private val collectionName: String? = null
+        public val collectionName: String? = null
 
     }
 }
