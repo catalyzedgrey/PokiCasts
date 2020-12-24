@@ -10,9 +10,10 @@
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:queryHint="Search by city name"/>
+        android:queryHint="Search by city name" />
 
     <androidx.recyclerview.widget.RecyclerView
+        android:background="@color/colorPrimary"
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

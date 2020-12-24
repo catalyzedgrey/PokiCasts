@@ -26,4 +26,6 @@ object Model {
         public val collectionName: String? = null
 
     }
+
+    data class Ep(val title: String, val description: String, val url: String, val length: String, val pubDate: String ){}
 }

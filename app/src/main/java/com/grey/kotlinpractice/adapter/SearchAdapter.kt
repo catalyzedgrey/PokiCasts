@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
@@ -22,7 +23,7 @@ class SearchAdapter(
         val podIcon: ImageView = view.findViewById(R.id.icon)
         val artistName: TextView = view.findViewById(R.id.name)
         val title: TextView = view.findViewById(R.id.title)
-        val subscribeBtn: Button = view.findViewById(R.id.subscribe_btn)
+        val subscribeBtn: ImageView = view.findViewById(R.id.subscribe_btn)
     }
 
     override fun getItemId(position: Int): Long {
@@ -47,7 +48,6 @@ class SearchAdapter(
         Picasso.get().load(url).resize(200,200).into(holder.podIcon)
         holder.artistName.text = allResults[position].artistName
         holder.title.text = allResults[position].collectionName
-        holder.subscribeBtn.text = "SUBSCRIBE"
     }
 
     override fun getItemCount(): Int {

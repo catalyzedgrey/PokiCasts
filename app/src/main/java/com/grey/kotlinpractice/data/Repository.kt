@@ -13,6 +13,7 @@ import retrofit2.Response
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlin.collections.ArrayList
 
 
 class Repository @Inject constructor(private val webservice: ItunesService) {
@@ -37,8 +38,16 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
 //        return data
 //    }
 
-    fun getResult(searchQuery: String): LiveData<Model.Results>{
-        subscription = webservice.getResults("waypoint", "podcast").subscribeOn(Schedulers.io())
+    fun getResult(searchQuery: String): MutableLiveData<Model.Results>{
+        subscription = webservice.getResults(searchQuery, "podcast").subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
+        return mutableLiveData
+    }
+
+    fun getXMLResult(index: Int): ArrayList<Episode>{
+        subscription = webservice.getResults(searchQuery, "podcast").subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
@@ -46,7 +55,8 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
     }
 
     private fun onFailure(t: Throwable?) {
-        TODO("Not yet implemented")
+        //TODO("Not yet implemented")
+        Log.e("error", t?.printStackTrace().toString())
     }
 
     private fun onResponse(response: Model.Results) {

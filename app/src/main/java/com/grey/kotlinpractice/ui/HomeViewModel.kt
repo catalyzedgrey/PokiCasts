@@ -27,18 +27,18 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     //@Inject
     lateinit var repository: Repository
 
-    val currentName: MutableLiveData<Model.Results> by lazy {
-        MutableLiveData<Model.Results>()
-    }
+//    val currentName: MutableLiveData<Model.Results> by lazy {
+//        MutableLiveData<Model.Results>()
+//    }
     lateinit var  data : LiveData<Model.Results>
+
 
     var disposable: Disposable? = null
 
     init {
         inject()
-        loadResults()
         repository = Repository_Factory.newInstance(itunesService)
-        data = repository.getResult("waypoint")
+        loadResults("")
     }
 
     private fun inject() {
@@ -47,9 +47,8 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    private fun loadResults() {
-
-
+    public fun loadResults(s: String) {
+        data = repository.getResult(s)
 
 //        subscription = itunesService.getResults("waypoint", "podcast").subscribeOn(Schedulers.io())
 //            .observeOn(AndroidSchedulers.mainThread())
@@ -57,20 +56,6 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 //            .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
 
 
-    }
-
-    private fun onFailure(t: Throwable) {
-        Log.v("RESPONSE", "fail --------------")
-        //Toast.makeText(this,t.message, Toast.LENGTH_SHORT).show()
-    }
-
-    private fun onResponse(response: Model.Results) {
-        //result = response
-
-        //result = response
-
-
-        Log.v("RESPONSE", "response --------------")
     }
 
 
