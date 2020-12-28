@@ -3,7 +3,8 @@ package com.grey.kotlinpractice.data
 import com.google.gson.annotations.Expose
 
 import com.google.gson.annotations.SerializedName
-
+import tw.ktrssreader.annotation.RssTag
+import java.io.Serializable
 
 
 object Model {
@@ -27,5 +28,6 @@ object Model {
 
     }
 
-    data class Ep(val title: String, val description: String, val url: String, val length: String, val pubDate: String ){}
+//    @RssTag(name = "channel")
+//    data class Ep(val title: String, val url: String, val description: String, val duration: String, val pubDate: String ):Serializable{}
 }

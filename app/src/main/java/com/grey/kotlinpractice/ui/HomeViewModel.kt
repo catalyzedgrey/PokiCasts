@@ -13,6 +13,8 @@ import com.grey.kotlinpractice.di.component.ViewModelComponent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
+import tw.ktrssreader.model.channel.ITunesChannelData
+import tw.ktrssreader.model.channel.RssStandardChannelData
 import javax.inject.Inject
 
 
@@ -31,6 +33,7 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 //        MutableLiveData<Model.Results>()
 //    }
     lateinit var  data : LiveData<Model.Results>
+    var  rssData : LiveData<ITunesChannelData>? = null
 
 
     var disposable: Disposable? = null
@@ -56,6 +59,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 //            .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
 
 
+    }
+
+    fun getXMLResult(index: Int){
+        rssData = repository.getXMLResult(index)
     }
 
 

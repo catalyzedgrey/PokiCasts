@@ -15,12 +15,4 @@
 
         />
 
-<!--    <TextView-->
-<!--        android:id="@+id/textView"-->
-<!--        android:layout_width="fill_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_gravity="center"-->
-<!--        android:padding="@dimen/txv_padding"-->
-<!--        android:textColor="@android:color/black"/>-->
-
 </FrameLayout>
