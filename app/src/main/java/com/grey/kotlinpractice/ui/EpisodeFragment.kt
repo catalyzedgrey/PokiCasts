@@ -1,8 +1,5 @@
 package com.grey.kotlinpractice.ui
 
-//import com.grey.kotlinpractice.di.component.DaggerExoPlayerComponent
-//import com.grey.kotlinpractice.di.component.DaggerViewModelComponent
-
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -14,13 +11,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.exoplayer2.Player
+import com.grey.kotlinpractice.HomeViewModel
 import com.grey.kotlinpractice.PodcastPlayer
 import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.adapter.EpisodeAdapter
 import com.grey.kotlinpractice.data.Model
 import com.squareup.picasso.Picasso
 import tw.ktrssreader.model.channel.ITunesChannelData
+import tw.ktrssreader.model.item.ITunesItem
 import tw.ktrssreader.model.item.ITunesItemData
 
 
@@ -58,7 +56,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener  {
         adapter.setOnPlayButtonClickedListener(this)
         recyclerView.adapter = adapter
 
-        podIcon = view.findViewById(R.id.podIconControl)
+        podIcon = view.findViewById(R.id.mainpodIconControl)
 
         updateRecyclerViewResults()
         observeRssData()
@@ -71,7 +69,10 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener  {
         if (podIndex != "") {
             updateListing()
             val res: Model.Results = viewModel.data.value!!
-            Log.v("fragTest", res.results[podIndex.toInt()].feedUrl)
+            if(res.results[podIndex.toInt()].collectionName == null)
+                adapter.artistName = res.results[podIndex.toInt()].artistName
+            else
+                adapter.artistName = res.results[podIndex.toInt()].collectionName!!
             Picasso.get().load(res.results[podIndex.toInt()].artworkUrl600).resize(450, 450)
                 .into(podIcon)
 
@@ -82,8 +83,10 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener  {
         val resultObserver = Observer<ITunesChannelData> { result ->
             // Update the UI
             Log.v("XML", "xml result from frag--------")
+            result.author
             itemList = result.items as ArrayList<ITunesItemData>
             adapter.updateList(itemList)
+
             recyclerView.adapter = adapter
         }
         viewModel.rssData?.observe(viewLifecycleOwner, resultObserver)
@@ -92,6 +95,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener  {
     private fun updateListing() {
         //var podcast: Model.Podcast = res.results[podIndex.toInt()]
         viewModel.getXMLResult(podIndex.toInt())
+
     }
 
     fun updatePodcastIndex(index: String) {
@@ -102,24 +106,9 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener  {
         return adapter
     }
 
-    override fun sendPodcastUri(uri: String, title: String) {
-
-        PodcastPlayer.preparePlayer(uri, title)
-        //val m = activity as MainActivity
-        //m.preparePlayer(uri)
+    override fun sendPodcastUri(uri: String) {
+        PodcastPlayer.preparePlayer(uri)
     }
 
-//    fun setButtonImageResource(clickedUri: String, position: Int, holder: EpisodeAdapter.MyViewHolder) {
-//
-//        if (!PodcastPlayer.isPlaying()) {
-//            holder.playBtn.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp)
-//        } else if (PodcastPlayer.isPlaying() && clickedUri != PodcastPlayer.getCurrentUri()) {
-//            holder.
-//            Log.v("clickListener", PodcastPlayer.getCurrentUri())
-//        } else {
-//            imgView.setImageResource(R.drawable.ic_play_circle_filled_white_24dp)
-//        }
-//        previousPlayingId = imgView.id
-//    }
 
 }

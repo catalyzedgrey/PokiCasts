@@ -13,10 +13,10 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.grey.kotlinpractice.HomeViewModel
 import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.adapter.SearchAdapter
 import com.grey.kotlinpractice.data.Model
-import kotlinx.android.synthetic.main.fragment_search.view.*
 
 
 class SearchFragment : Fragment() {
@@ -61,7 +61,6 @@ class SearchFragment : Fragment() {
 
         val resultObserver = Observer<Model.Results> { result ->
             // Update the UI
-            Log.v("changing UI", "changing UI--------")
             adapter.updateList(result.results)
             recyclerView.adapter = adapter
         }

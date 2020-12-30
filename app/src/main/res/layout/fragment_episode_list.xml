@@ -8,7 +8,7 @@
     android:background="@color/colorPrimary">
 
     <ImageView
-        android:id="@+id/podIconControl"
+        android:id="@+id/mainpodIconControl"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,6 +20,6 @@
         android:id="@+id/recyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/podIconControl"
+        app:layout_constraintTop_toBottomOf="@id/mainpodIconControl"
         />
 </androidx.constraintlayout.widget.ConstraintLayout>

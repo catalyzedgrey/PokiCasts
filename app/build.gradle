@@ -75,6 +75,7 @@ dependencies {
     implementation "com.github.ivanisidrowu.KtRssReader:annotation:v2.0.1"
     kapt "com.github.ivanisidrowu.KtRssReader:processor:v2.0.1"
 
+
     implementation 'com.google.android.exoplayer:exoplayer:2.12.2'
 
 

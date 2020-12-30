@@ -1,8 +1,6 @@
-package com.grey.kotlinpractice.ui
+package com.grey.kotlinpractice
 
-import android.util.Log
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.grey.kotlinpractice.data.ItunesService
 import com.grey.kotlinpractice.data.Model
@@ -10,11 +8,8 @@ import com.grey.kotlinpractice.data.Repository
 import com.grey.kotlinpractice.data.Repository_Factory
 import com.grey.kotlinpractice.di.component.DaggerViewModelComponent
 import com.grey.kotlinpractice.di.component.ViewModelComponent
-import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
-import io.reactivex.schedulers.Schedulers
 import tw.ktrssreader.model.channel.ITunesChannelData
-import tw.ktrssreader.model.channel.RssStandardChannelData
 import javax.inject.Inject
 
 

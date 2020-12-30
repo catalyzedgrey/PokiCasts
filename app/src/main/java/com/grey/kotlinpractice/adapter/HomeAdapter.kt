@@ -21,7 +21,6 @@ class HomeAdapter(context: Context, private val resource: Int, private var itemL
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var mConvertView = convertView
-        Log.v("called", "called from getview")
         val holder: MyViewHolder
         if (mConvertView == null) {
             mConvertView = LayoutInflater.from(context).inflate(resource, parent, false)

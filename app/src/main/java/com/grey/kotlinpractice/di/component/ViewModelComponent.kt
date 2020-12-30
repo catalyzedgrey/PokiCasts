@@ -1,7 +1,7 @@
 package com.grey.kotlinpractice.di.component
 
 import com.grey.kotlinpractice.di.module.NetworkModule
-import com.grey.kotlinpractice.ui.HomeViewModel
+import com.grey.kotlinpractice.HomeViewModel
 import dagger.Component
 import javax.inject.Singleton
 

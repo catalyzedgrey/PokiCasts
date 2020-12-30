@@ -9,8 +9,7 @@ import android.widget.GridView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Observer
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import com.grey.kotlinpractice.HomeViewModel
 import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.adapter.HomeAdapter
 //import com.grey.kotlinpractice.adapter.PodcastHomeAdapter
@@ -47,7 +46,6 @@ class HomeFragment : Fragment() {
 
 
         gridView.setOnItemClickListener{parent, view, position, id ->
-            Log.v("touch", itemList[position].artistName)
             SendPodcastIndex(position.toString())
         }
 //        val manager: RecyclerView.LayoutManager = GridLayoutManager(view.context, 3)
@@ -68,7 +66,6 @@ class HomeFragment : Fragment() {
 
         val gridObserver = Observer<Model.Results> { result ->
             // Update the UI
-            Log.v("changing UI", "changing UI--------")
             itemList = result.results
             adapter.updateList(result.results)
             gridView.adapter = adapter

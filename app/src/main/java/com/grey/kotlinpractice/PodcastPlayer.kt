@@ -16,7 +16,8 @@ object PodcastPlayer : Player.EventListener {
     private lateinit var exoPlayer: SimpleExoPlayer
     private lateinit var mediaItem: MediaItem
     private var currentUri: String = ""
-    //private lateinit var episodeTitle: String
+    private var episodeTitle: String = ""
+    private var artistTitle: String = ""
 
 
     fun initPlayer(context: Context) {
@@ -25,9 +26,9 @@ object PodcastPlayer : Player.EventListener {
 
     }
 
-    fun preparePlayer(uri: String, title: String) {
+    fun preparePlayer(uri: String) {
 
-        //episodeTitle = title
+
         if (currentUri != uri) {
 
 
@@ -74,13 +75,18 @@ object PodcastPlayer : Player.EventListener {
         return exoPlayer
     }
 
-    fun setListener(listener: Player.EventListener) {
+    fun addListener(listener: Player.EventListener) {
         exoPlayer.addListener(listener)
     }
 
-//    fun getEpisodeTitle(): String {
-//        return episodeTitle
-//    }
+    fun setEpisodeTitle(episodeTitle: String){
+        this.episodeTitle = episodeTitle
+    }
+
+    fun getEpisodeTitle(): String{return this.episodeTitle}
+
+    fun setArtistTitle(artistTitle: String){this.artistTitle = artistTitle }
+    fun getArtistTitle(): String{return this.artistTitle}
 
 
 }

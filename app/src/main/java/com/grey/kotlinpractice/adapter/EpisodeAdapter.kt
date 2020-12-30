@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.Player
 import com.grey.kotlinpractice.PodcastPlayer
 import com.grey.kotlinpractice.R
+import tw.ktrssreader.model.channel.ITunesChannelData
+import tw.ktrssreader.model.item.ITunesItem
 import tw.ktrssreader.model.item.ITunesItemData
 
 
@@ -19,6 +21,7 @@ class EpisodeAdapter(
 ) : RecyclerView.Adapter<EpisodeAdapter.MyViewHolder>() {
     lateinit var mCallback: PlayButtonClickedListener
     private var currentPosition = -1
+    lateinit var artistName: String
 
 
 //    override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -32,16 +35,16 @@ class EpisodeAdapter(
 //    }
 
     interface PlayButtonClickedListener {
-        fun sendPodcastUri(uri: String, title: String)
+        fun sendPodcastUri(uri: String)
     }
 
     fun setOnPlayButtonClickedListener(callback: PlayButtonClickedListener) {
         this.mCallback = callback
     }
 
-    private fun sendPodcastEpisodeInfo(uri: String, title: String) {
+    private fun sendPodcastEpisodeInfo(uri: String) {
         //here you can get the text from the edit text or can use this method according to your need
-        mCallback.sendPodcastUri(uri, title)
+        mCallback.sendPodcastUri(uri)
     }
 
 
@@ -69,43 +72,18 @@ class EpisodeAdapter(
     }
 
     override fun onBindViewHolder(holder: EpisodeAdapter.MyViewHolder, position: Int) {
-        PodcastPlayer.setListener(holder)
+        PodcastPlayer.addListener(holder)
         holder.episodeReleaseDate.text = itemList[position].pubDate
         holder.episodeTitle.text = itemList[position].title
         holder.duration.text = itemList[position].duration
         holder.uri = itemList[position].enclosure!!.url!!
 
-        holder.playBtn.tag = 1;
 
         holder.playBtn.setOnClickListener {
-            sendPodcastEpisodeInfo(itemList[position].enclosure!!.url!!,
-                holder.episodeTitle.text as String)
-
-//            val playStopButtonState = holder.playBtn.tag
-//            var previousPosition = currentPosition
-//
-//            if (playStopButtonState == 1) {
-//                currentPosition = holder.adapterPosition;
-//                holder.playBtn.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp);
-//                holder.playBtn.tag = 2;
-//            } else {
-//                currentPosition = -1;
-//                holder.playBtn.setImageResource(R.drawable.ic_play_circle_filled_white_24dp);
-//                holder.playBtn.tag = 1;
-//            }
-//            if (previousPosition != -1) {
-//                notifyItemChanged(previousPosition);
-//            }
-
+            sendPodcastEpisodeInfo(itemList[position].enclosure!!.url!!)
+            PodcastPlayer.setArtistTitle(artistName)
+            PodcastPlayer.setEpisodeTitle(holder.episodeTitle.text.toString())
         }
-
-//        if (currentPosition == position) {
-//            holder.playBtn.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp);
-//        } else {
-//            holder.playBtn.setImageResource(R.drawable.ic_play_circle_filled_white_24dp);
-//        }
-
-
     }
 
 
@@ -117,6 +95,8 @@ class EpisodeAdapter(
         itemList = newList
         notifyDataSetChanged()
     }
+
+
 
 
 }

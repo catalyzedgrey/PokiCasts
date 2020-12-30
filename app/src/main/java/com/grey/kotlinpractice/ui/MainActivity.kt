@@ -1,22 +1,32 @@
 package com.grey.kotlinpractice.ui
 
-import androidx.appcompat.app.AppCompatActivity
+//import com.grey.kotlinpractice.adapter.PodcastHomeAdapter
+//import com.grey.kotlinpractice.di.component.ContextComponent
+//import com.grey.kotlinpractice.di.component.DaggerContextComponent
 import android.os.Bundle
-import android.util.Log
+import android.os.Handler
+import android.view.DragEvent
+import android.view.MotionEvent
+import android.view.View
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.ui.StyledPlayerControlView
 import com.google.android.exoplayer2.ui.TimeBar
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.grey.kotlinpractice.HomeViewModel
 import com.grey.kotlinpractice.PodcastPlayer
 import com.grey.kotlinpractice.R
-//import com.grey.kotlinpractice.adapter.PodcastHomeAdapter
 import com.grey.kotlinpractice.databinding.ActivityMainBinding
-//import com.grey.kotlinpractice.di.component.ContextComponent
-//import com.grey.kotlinpractice.di.component.DaggerContextComponent
+import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
+import kotlinx.android.synthetic.main.bottomsheet.*
 
 class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Player.EventListener,
     TimeBar.OnScrubListener {
@@ -26,8 +36,13 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     private val searchFragment = SearchFragment()
     private val settingsFragment = SettingsFragment()
     private val episodeFragment = EpisodeFragment()
-    //private lateinit var exoPlayer: ExoPlayer
 
+    lateinit var bottomNavigationView: BottomNavigationView
+
+    private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
+
+    lateinit var imgViewSheet: ImageView
+    lateinit var defaultTimeBar: DefaultTimeBar
 
     private val viewModel: HomeViewModel by viewModels()
 
@@ -47,6 +62,54 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
             supportFragmentManager.beginTransaction()
                 .replace(R.id.container, homeFragment, homeFragment.javaClass.getSimpleName())
                 .commit()
+        }
+
+        bottomNavigationView = binding.root.findViewById(R.id.bottomNavigationView)
+
+
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+
+
+
+
+
+
+        imgViewSheet = binding.root.findViewById<ImageView>(R.id.mainpodIconControl)
+        binding.root.findViewById<StyledPlayerControlView>(R.id.player_control).player =
+            PodcastPlayer.getPlayer()
+        defaultTimeBar = binding.root.findViewById<DefaultTimeBar>(R.id.exo_progress)
+        defaultTimeBar.addListener(this)
+
+        val behaviour: BottomSheetBehavior<*> = BottomSheetBehavior.from(bottomSheet)
+        behaviour.state
+
+        var bottomSheetBehaviorCallback =
+            object : BottomSheetBehavior.BottomSheetCallback() {
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+                }
+
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    if(newState == BottomSheetBehavior.STATE_COLLAPSED){
+                        bottomNavigationView.visibility = View.VISIBLE
+
+                    }
+                }
+            }
+
+        bottomSheetBehavior.addBottomSheetCallback(bottomSheetBehaviorCallback)
+
+        imgViewSheet.setOnClickListener {
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+
+            } else {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                bottomNavigationView.visibility = View.GONE
+
+            }
         }
 
 
@@ -93,8 +156,12 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
         }
 
+
+
         //initUi();
     }
+
+
 
 
     override fun onAttachFragment(fragment: Fragment) {
@@ -104,6 +171,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
     override fun sendPodcastIndex(podcastPosIndex: String) {
+
+
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, episodeFragment, episodeFragment.javaClass.getSimpleName())
             .addToBackStack("tag")
@@ -141,6 +210,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         return
     }
 
+
+
 //    fun preparePlayer(uri: String) {
 //        val mediaItem: MediaItem = MediaItem.fromUri(Uri.parse(uri))
 //        // Set the media item to be played.
@@ -156,14 +227,32 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         PodcastPlayer.initPlayer(applicationContext)
         val playerView: StyledPlayerControlView =
             findViewById<StyledPlayerControlView>(R.id.exoplayer)
+//        playerView.player = PodcastPlayer.getPlayer()
+
+//        val playerView: StyledPlayerView =
+//            findViewById<StyledPlayerView>(R.id.player_view)
         playerView.player = PodcastPlayer.getPlayer()
-        var timeBar: DefaultTimeBar = binding.root.findViewById<DefaultTimeBar>(R.id.exo_progress)
-        timeBar.addListener(this)
-        timeBar.setEnabled(false)
+        PodcastPlayer.addListener(this)
+
 
     }
 
+    override fun onBackPressed() {
+        //super.onBackPressed()
+        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
 
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        super.onIsPlayingChanged(isPlaying)
+        if (isPlaying) {
+            val epTitle = PodcastPlayer.getEpisodeTitle()
+            val artName = PodcastPlayer.getArtistTitle()
+            findViewById<TextView>(R.id.episode_title_sheet).text = epTitle
+            findViewById<TextView>(R.id.artist_title_sheet).text = artName
+
+        }
+    }
 }
 
 

@@ -14,9 +14,8 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import tw.ktrssreader.Reader
-import tw.ktrssreader.model.channel.ITunesChannel
-import tw.ktrssreader.model.channel.ITunesChannelData
-import tw.ktrssreader.model.channel.RssStandardChannelData
+import tw.ktrssreader.model.channel.*
+import java.nio.charset.Charset
 import java.util.*
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -24,6 +23,7 @@ import kotlin.collections.ArrayList
 
 
 class Repository @Inject constructor(private val webservice: ItunesService) {
+
 
     private lateinit var subscription: Disposable
     private val mutableLiveData: MutableLiveData<Model.Results> by lazy {
@@ -66,7 +66,8 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
 //            result.items?.size
 
             mutableRSSData.postValue(
-                Reader.read<ITunesChannelData>(mutableLiveData.value!!.results[index].feedUrl))
+                Reader.read<ITunesChannelData>(mutableLiveData.value!!.results[index].feedUrl)
+            )
 
             Log.v("XML", "xml result from repo--------")
         }
@@ -74,7 +75,6 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
 
 
     }
-
 
     private fun onFailure(t: Throwable?) {
         //TODO("Not yet implemented")
