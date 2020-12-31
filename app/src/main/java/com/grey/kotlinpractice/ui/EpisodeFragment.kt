@@ -82,8 +82,6 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener  {
     private fun observeRssData() {
         val resultObserver = Observer<ITunesChannelData> { result ->
             // Update the UI
-            Log.v("XML", "xml result from frag--------")
-            result.author
             itemList = result.items as ArrayList<ITunesItemData>
             adapter.updateList(itemList)
 

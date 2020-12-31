@@ -79,14 +79,25 @@ object PodcastPlayer : Player.EventListener {
         exoPlayer.addListener(listener)
     }
 
-    fun setEpisodeTitle(episodeTitle: String){
+    fun setEpisodeTitle(episodeTitle: String) {
         this.episodeTitle = episodeTitle
     }
 
-    fun getEpisodeTitle(): String{return this.episodeTitle}
+    fun getEpisodeTitle(): String {
+        return this.episodeTitle
+    }
 
-    fun setArtistTitle(artistTitle: String){this.artistTitle = artistTitle }
-    fun getArtistTitle(): String{return this.artistTitle}
+    fun setArtistTitle(artistTitle: String) {
+        this.artistTitle = artistTitle
+    }
+
+    fun getArtistTitle(): String {
+        return this.artistTitle
+    }
+
+    fun release() {
+        exoPlayer.release()
+    }
 
 
 }

@@ -19,19 +19,11 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 
     private val injector: ViewModelComponent = DaggerViewModelComponent.builder()
         .networkModule(com.grey.kotlinpractice.di.module.NetworkModule).build()
-    private lateinit var subscription: Disposable
 
-    //@Inject
     lateinit var repository: Repository
 
-//    val currentName: MutableLiveData<Model.Results> by lazy {
-//        MutableLiveData<Model.Results>()
-//    }
     lateinit var  data : LiveData<Model.Results>
     var  rssData : LiveData<ITunesChannelData>? = null
-
-
-    var disposable: Disposable? = null
 
     init {
         inject()
@@ -47,29 +39,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 
     public fun loadResults(s: String) {
         data = repository.getResult(s)
-
-//        subscription = itunesService.getResults("waypoint", "podcast").subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribeOn(Schedulers.io())
-//            .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
-
-
     }
 
     fun getXMLResult(index: Int){
         rssData = repository.getXMLResult(index)
     }
-
-
-    //    fun getResults(): LiveData<Model.Results> {
-//
-////        return Repository.
-//    }
-    override fun onCleared() {
-        super.onCleared()
-        // Dispose All your Subscriptions to avoid memory leaks
-        subscription?.dispose()
-    }
-
 
 }

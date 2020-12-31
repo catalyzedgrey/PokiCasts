@@ -53,10 +53,6 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         val view = binding.root
         setContentView(view)
 
-        initPodcastPlayer()
-
-
-        //region frag
         if (savedInstanceState == null) {
             //val fragment = HomeFragment()
             supportFragmentManager.beginTransaction()
@@ -64,56 +60,13 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
                 .commit()
         }
 
-        bottomNavigationView = binding.root.findViewById(R.id.bottomNavigationView)
+        initPodcastPlayer()
+        initUi()
+        handleBottomNavSwitching()
 
+    }
 
-        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-
-
-
-
-
-
-        imgViewSheet = binding.root.findViewById<ImageView>(R.id.mainpodIconControl)
-        binding.root.findViewById<StyledPlayerControlView>(R.id.player_control).player =
-            PodcastPlayer.getPlayer()
-        defaultTimeBar = binding.root.findViewById<DefaultTimeBar>(R.id.exo_progress)
-        defaultTimeBar.addListener(this)
-
-        val behaviour: BottomSheetBehavior<*> = BottomSheetBehavior.from(bottomSheet)
-        behaviour.state
-
-        var bottomSheetBehaviorCallback =
-            object : BottomSheetBehavior.BottomSheetCallback() {
-
-                override fun onSlide(bottomSheet: View, slideOffset: Float) {
-
-                }
-
-                override fun onStateChanged(bottomSheet: View, newState: Int) {
-                    if(newState == BottomSheetBehavior.STATE_COLLAPSED){
-                        bottomNavigationView.visibility = View.VISIBLE
-
-                    }
-                }
-            }
-
-        bottomSheetBehavior.addBottomSheetCallback(bottomSheetBehaviorCallback)
-
-        imgViewSheet.setOnClickListener {
-            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-
-            } else {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                bottomNavigationView.visibility = View.GONE
-
-            }
-        }
-
-
-        val bottomNavigationView = view.bottomNavigationView
+    private fun handleBottomNavSwitching() {
         bottomNavigationView.setOnNavigationItemSelectedListener {
             when (it.itemId) {
                 R.id.menu_home -> {
@@ -151,17 +104,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
                 }
                 else -> false
             }
-
-            //endregion
-
         }
-
-
-
-        //initUi();
     }
-
-
 
 
     override fun onAttachFragment(fragment: Fragment) {
@@ -185,13 +129,78 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     }
 
-    fun initUi() {
-//        val searchBtn = findViewById<Button>(R.id.search_btn);
-//        searchBtn.setOnClickListener {
-//            beginSearch("waypoint");
-//        }
+    private fun initUi() {
+        bottomNavigationView = binding.root.findViewById(R.id.bottomNavigationView)
+        bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
+        imgViewSheet = binding.root.findViewById<ImageView>(R.id.mainpodIconControl)
+        binding.root.findViewById<StyledPlayerControlView>(R.id.player_control).player =
+            PodcastPlayer.getPlayer()
+        defaultTimeBar = binding.root.findViewById<DefaultTimeBar>(R.id.exo_progress)
+        defaultTimeBar.addListener(this)
+
+        val bottomSheetBehaviorCallback =
+            object : BottomSheetBehavior.BottomSheetCallback() {
+
+                override fun onSlide(bottomSheet: View, slideOffset: Float) {
+
+                }
+
+                override fun onStateChanged(bottomSheet: View, newState: Int) {
+                    if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
+                        bottomNavigationView.visibility = View.VISIBLE
+
+                    }
+                }
+            }
+
+        bottomSheetBehavior.addBottomSheetCallback(bottomSheetBehaviorCallback)
+        imgViewSheet.setOnClickListener {
+            if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            } else {
+                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                bottomNavigationView.visibility = View.GONE
+            }
+        }
+
+
     }
 
+    private fun initPodcastPlayer() {
+        PodcastPlayer.initPlayer(applicationContext)
+        val playerView: StyledPlayerControlView =
+            findViewById<StyledPlayerControlView>(R.id.exoplayer)
+        playerView.player = PodcastPlayer.getPlayer()
+        PodcastPlayer.addListener(this)
+    }
+
+    override fun onBackPressed() {
+        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
+            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+
+        else
+            super.onBackPressed()
+
+    }
+
+    override fun onIsPlayingChanged(isPlaying: Boolean) {
+        super.onIsPlayingChanged(isPlaying)
+        if (isPlaying) {
+            val epTitle = PodcastPlayer.getEpisodeTitle()
+            val artName = PodcastPlayer.getArtistTitle()
+            findViewById<TextView>(R.id.episode_title_sheet).text = epTitle
+            findViewById<TextView>(R.id.artist_title_sheet).text = artName
+
+        }
+    }
+
+    override fun onStop() {
+        PodcastPlayer.release()
+        super.onStop()
+    }
+
+
+    //region trashy scrub handling
     override fun onScrubStart(timeBar: TimeBar, position: Long) {
         //TODO("Not yet implemented")
         timeBar.setEnabled(false)
@@ -209,50 +218,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         timeBar.setEnabled(false)
         return
     }
-
-
-
-//    fun preparePlayer(uri: String) {
-//        val mediaItem: MediaItem = MediaItem.fromUri(Uri.parse(uri))
-//        // Set the media item to be played.
-//        exoPlayer.setMediaItem(mediaItem)
-//        // Prepare the player.
-//        exoPlayer.prepare()
-//        // Start the playback.
-//        exoPlayer.play()
-//
-//    }
-
-    private fun initPodcastPlayer() {
-        PodcastPlayer.initPlayer(applicationContext)
-        val playerView: StyledPlayerControlView =
-            findViewById<StyledPlayerControlView>(R.id.exoplayer)
-//        playerView.player = PodcastPlayer.getPlayer()
-
-//        val playerView: StyledPlayerView =
-//            findViewById<StyledPlayerView>(R.id.player_view)
-        playerView.player = PodcastPlayer.getPlayer()
-        PodcastPlayer.addListener(this)
-
-
-    }
-
-    override fun onBackPressed() {
-        //super.onBackPressed()
-        if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
-            bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-    }
-
-    override fun onIsPlayingChanged(isPlaying: Boolean) {
-        super.onIsPlayingChanged(isPlaying)
-        if (isPlaying) {
-            val epTitle = PodcastPlayer.getEpisodeTitle()
-            val artName = PodcastPlayer.getArtistTitle()
-            findViewById<TextView>(R.id.episode_title_sheet).text = epTitle
-            findViewById<TextView>(R.id.artist_title_sheet).text = artName
-
-        }
-    }
+    //endregion
 }
 
 
