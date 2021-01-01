@@ -45,7 +45,7 @@ class HomeFragment : Fragment() {
         gridView.adapter = adapter
 
 
-        gridView.setOnItemClickListener{parent, view, position, id ->
+        gridView.setOnItemClickListener{ _, _, position, _ ->
             SendPodcastIndex(position.toString())
         }
 //        val manager: RecyclerView.LayoutManager = GridLayoutManager(view.context, 3)
@@ -64,17 +64,17 @@ class HomeFragment : Fragment() {
 //        }
 
 
-        val gridObserver = Observer<Model.Results> { result ->
+        val gridObserver = Observer<List<Model.Podcast>> { result ->
             // Update the UI
-            itemList = result.results
-            adapter.updateList(result.results)
+            itemList = result as ArrayList<Model.Podcast>
+            adapter.updateList(itemList)
             gridView.adapter = adapter
 
 //            recyclerView.adapter = adapter
 
 
         }
-        viewModel.data.observe(viewLifecycleOwner, gridObserver)
+        viewModel.subscribedPodList.observe(viewLifecycleOwner, gridObserver)
 
 
     }

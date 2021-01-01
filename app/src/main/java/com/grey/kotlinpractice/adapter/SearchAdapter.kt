@@ -9,15 +9,34 @@ import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.grey.kotlinpractice.HomeViewModel
 import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.data.Model
+import com.grey.kotlinpractice.data.PodcastDao
 import com.squareup.picasso.Picasso
 
 class SearchAdapter(
     private val context: Context,
-    private var allResults: ArrayList<Model.Podcast>
+    private var allResults: ArrayList<Model.Podcast>,
+    private val viewModel: HomeViewModel
 ) : RecyclerView.Adapter<SearchAdapter.MyViewHolder>() {
+    lateinit var mCallback: SubscribeButtonClickedListener
+
+
+    interface SubscribeButtonClickedListener {
+        fun sendPodcastInfo(pod: Model.Podcast)
+    }
+
+    fun setOnSubscribeButtonClickedListener(callback: SubscribeButtonClickedListener) {
+        this.mCallback = callback
+    }
+
+    fun sendPodcastInfo(pod: Model.Podcast){
+        mCallback.sendPodcastInfo(pod)
+    }
 
     class MyViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         val podIcon: ImageView = view.findViewById(R.id.icon)
@@ -48,7 +67,20 @@ class SearchAdapter(
         Picasso.get().load(url).resize(200,200).into(holder.podIcon)
         holder.artistName.text = allResults[position].artistName
         holder.title.text = allResults[position].collectionName
+        val r = viewModel.repository.getAllSubscribed()
+        for(i in r.s){
+            if
+        }
+
+        holder.subscribeBtn.setOnClickListener{
+            //sendPodcastInfo(Model.Podcast())
+            viewModel.subscribeToPodcast(allResults[position])
+            viewModel.getSubscribedPodcasts()
+
+        }
     }
+
+    fun ()
 
     override fun getItemCount(): Int {
         return allResults.size

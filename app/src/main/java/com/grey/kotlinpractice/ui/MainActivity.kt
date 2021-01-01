@@ -23,6 +23,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.grey.kotlinpractice.HomeViewModel
 import com.grey.kotlinpractice.PodcastPlayer
 import com.grey.kotlinpractice.R
+import com.grey.kotlinpractice.data.AppDatabase
 import com.grey.kotlinpractice.databinding.ActivityMainBinding
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
@@ -130,6 +131,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
     private fun initUi() {
+        AppDatabase.DatabaseProvider.context = applicationContext
         bottomNavigationView = binding.root.findViewById(R.id.bottomNavigationView)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         imgViewSheet = binding.root.findViewById<ImageView>(R.id.mainpodIconControl)

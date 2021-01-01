@@ -41,11 +41,6 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener  {
     }
 
 
-    private fun setUpFrag() {
-        val m = activity as MainActivity
-        //m.test()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         super.onViewCreated(view, savedInstanceState)

@@ -55,7 +55,7 @@ class SearchFragment : Fragment() {
         val manager: RecyclerView.LayoutManager = LinearLayoutManager(view.context)
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = manager
-        adapter = SearchAdapter(view.context, itemList)
+        adapter = SearchAdapter(view.context, itemList, viewModel)
         recyclerView.adapter = adapter
 
 

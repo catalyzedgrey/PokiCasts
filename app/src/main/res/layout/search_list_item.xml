@@ -53,11 +53,12 @@
 
     <ImageView
         android:scaleType="fitXY"
-        android:adjustViewBounds="false"
+        android:adjustViewBounds="true"
+
         android:id="@+id/subscribe_btn"
         android:layout_marginEnd="15dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:src="@drawable/ic_baseline_add_circle_outline_white_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

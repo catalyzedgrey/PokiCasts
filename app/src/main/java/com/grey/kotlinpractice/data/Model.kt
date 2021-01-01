@@ -1,5 +1,9 @@
 package com.grey.kotlinpractice.data
 
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.ForeignKey
+import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 
 import com.google.gson.annotations.SerializedName
@@ -14,24 +18,49 @@ object Model {
     data class ResultCount(val resultCount: Int)
     data class Results(val results: ArrayList<Podcast>)
 
-    data class Podcast(val artistName: String, val feedUrl: String) {
-
+    @Entity
+    data class Podcast(
+        @PrimaryKey (autoGenerate = true) val uid: Int,
+        @ColumnInfo val artistName: String,
+        @ColumnInfo val feedUrl: String,
+        @ColumnInfo
         @SerializedName("artworkUrl600")
         @Expose
-        public val artworkUrl600: String? = null
-
+        public val artworkUrl600: String? = null,
+        @ColumnInfo
         @SerializedName("trackCount")
         @Expose
-        public val trackCount: Int? = null
-
+        public val trackCount: Int? = null,
+        @ColumnInfo
         @SerializedName("collectionName")
         @Expose
-        public val collectionName: String? = null
+        public val collectionName: String? = null,
+        @ColumnInfo
+        @SerializedName("releaseDate")
+        @Expose
+        public val releaseDate: String? = null
+    )
 
-    }
 
-//    @RssTag(name = "channel")
-//    data class Ep(val title: String, val url: String, val description: String, val duration: String, val pubDate: String ):Serializable{}
+    @Entity(
+        foreignKeys = [
+            ForeignKey(
+                entity = Model.Podcast::class,
+                parentColumns = arrayOf("uid"),
+                childColumns = arrayOf("podId"),
+                onDelete = ForeignKey.CASCADE
+            )
+        ]
+    )
+    data class Episode(
+        @PrimaryKey val id: Int,
+        @ColumnInfo val title: String,
+        @ColumnInfo val url: String,
+        @ColumnInfo val description: String,
+        @ColumnInfo val duration: String,
+        @ColumnInfo val pubDate: String,
+        @ColumnInfo val podId: String
+    )
 
 
 }

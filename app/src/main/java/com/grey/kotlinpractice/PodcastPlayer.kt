@@ -42,15 +42,15 @@ object PodcastPlayer : Player.EventListener {
             // Prepare the player.
             exoPlayer.prepare()
             // Start the playback.
-            play(uri)
+            play()
         } else if (currentUri == uri && isPlaying())
             pause()
         else if (currentUri == uri && !isPlaying())
-            play(uri)
+            play()
 
     }
 
-    fun play(uri: String) {
+    fun play() {
         exoPlayer.play()
     }
 
