@@ -7,6 +7,7 @@ import com.grey.kotlinpractice.di.component.DaggerViewModelComponent
 import com.grey.kotlinpractice.di.component.ViewModelComponent
 import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.*
+import tw.ktrssreader.model.channel.ITunesChannelData
 import javax.inject.Inject
 
 
@@ -59,8 +60,13 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 //        }
     }
 
-    fun getEpisodeList(url: String): LiveData<List<Model.Episode>>{
+    fun getLocalEpisodeList(url: String): LiveData<List<Model.Episode>>{
+        repository.episodeLiveList.value = null
         return repository.getEpisodeListLocally(url)
+    }
+
+    fun getRemoteEpisodeList(url: String): LiveData<ITunesChannelData>{
+        return repository.getEpisodeListRemotely(url)
     }
 
 

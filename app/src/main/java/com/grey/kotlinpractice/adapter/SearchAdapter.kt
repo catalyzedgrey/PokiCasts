@@ -55,6 +55,7 @@ class SearchAdapter(
     }
 
     fun updateList(newList: ArrayList<Model.Podcast>) {
+        allResults.clear()
         allResults = newList
         notifyDataSetChanged()
     }

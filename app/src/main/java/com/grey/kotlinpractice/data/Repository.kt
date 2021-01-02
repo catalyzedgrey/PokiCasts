@@ -26,7 +26,7 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
     }
 
 
-    private val mutableRSSData: MutableLiveData<ITunesChannelData> by lazy {
+    private val remoteEpisodeListLiveData: MutableLiveData<ITunesChannelData> by lazy {
         MutableLiveData<ITunesChannelData>()
     }
 
@@ -51,14 +51,7 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
         return podcastSearchResultLiveData
     }
 
-    fun getRemoteRssResult(index: Int): MutableLiveData<ITunesChannelData> {
-        coroutineScope.launch {
-            mutableRSSData.postValue(
-                Reader.read<ITunesChannelData>(podcastSearchResultLiveData.value!!.results[index].feedUrl)
-            )
-        }
-        return mutableRSSData
-    }
+
 
 //    fun getEpisodesList(feedUrl: String): MutableLiveData<List<Model.Episode>> {
 //        coroutineScope.launch {
@@ -93,8 +86,19 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
                 episodeLiveList.postValue(episodes)
             }
         }
-
         return episodeLiveList
+    }
+
+    fun getEpisodeListRemotely(feedUrl: String): MutableLiveData<ITunesChannelData> {
+        if(feedUrl != ""){
+            coroutineScope.launch {
+                remoteEpisodeListLiveData.postValue(
+                    Reader.read<ITunesChannelData>(feedUrl)
+                )
+            }
+        }
+
+        return remoteEpisodeListLiveData
     }
 
 

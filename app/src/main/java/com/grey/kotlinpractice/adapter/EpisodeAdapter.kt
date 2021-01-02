@@ -18,24 +18,16 @@ import tw.ktrssreader.model.item.ITunesItemData
 
 class EpisodeAdapter(
     private val context: Context,
-    private var itemList: ArrayList<Model.Episode>
+//    private var itemList: ArrayList<ITunesItemData>,
+    private var itemList: ArrayList<Model.Episode>,
 ) : RecyclerView.Adapter<EpisodeAdapter.MyViewHolder>() {
     lateinit var mCallback: PlayButtonClickedListener
     private var currentPosition = -1
     lateinit var artistName: String
 
 
-//    override fun onIsPlayingChanged(isPlaying: Boolean) {
-//        super.onIsPlayingChanged(isPlaying)
-//        if (isPlaying) {
-//            myViewHolder.playBtn.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp)
-//        } else {
-//            myViewHolder.playBtn.setImageResource(R.drawable.ic_play_circle_filled_white_24dp)
-//        }
-//
-//    }
-
     interface PlayButtonClickedListener {
+
         fun sendPodcastUri(uri: String)
     }
 
@@ -55,6 +47,7 @@ class EpisodeAdapter(
         val duration: TextView = view.findViewById(R.id.duration)
         val playBtn: ImageView = view.findViewById(R.id.play_btn)
         var uri: String = ""
+
 
         override fun onIsPlayingChanged(isPlaying: Boolean) {
             super.onIsPlayingChanged(isPlaying)
@@ -78,11 +71,14 @@ class EpisodeAdapter(
         holder.episodeReleaseDate.text = itemList[position].pubDate
         holder.episodeTitle.text = itemList[position].title
         holder.duration.text = itemList[position].duration
+//        holder.uri = itemList[position].enclosure!!.url!!
         holder.uri = itemList[position].url!!
+
         //holder.uri = itemList[position].enclosure!!.url!!
 
 
         holder.playBtn.setOnClickListener {
+//            sendPodcastEpisodeInfo(itemList[position].enclosure!!.url!!)
             sendPodcastEpisodeInfo(itemList[position].url!!)
             PodcastPlayer.setArtistTitle(artistName)
             PodcastPlayer.setEpisodeTitle(holder.episodeTitle.text.toString())
@@ -99,11 +95,18 @@ class EpisodeAdapter(
 //        notifyDataSetChanged()
 //    }
 
-        fun updateList(newList: ArrayList<Model.Episode>) {
+//    fun updateList(newList: ArrayList<ITunesItemData>) {
+//        itemList.clear()
+//        itemList = newList
+//        notifyDataSetChanged()
+//    }
+
+
+    fun updateList(newList: ArrayList<Model.Episode>) {
+        itemList.clear()
         itemList = newList
         notifyDataSetChanged()
     }
-
 
 
 

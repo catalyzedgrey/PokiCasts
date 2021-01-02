@@ -115,14 +115,12 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         }
     }
 
-    override fun sendPodcastIndex(podcastPosIndex: String, artworkUrl: String) {
-
-
+    override fun sendPodcastIndex(podcastPosIndex: String, artworkUrl: String, collectionName: String) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, episodeFragment, episodeFragment.javaClass.getSimpleName())
             .addToBackStack("tag")
             .commit()
-        episodeFragment.updatePodcastIndex(podcastPosIndex, artworkUrl)
+        episodeFragment.updatePodcastIndex(podcastPosIndex, artworkUrl, collectionName)
     }
 
 

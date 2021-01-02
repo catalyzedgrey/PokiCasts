@@ -38,6 +38,7 @@ class HomeAdapter(context: Context, private val resource: Int, private var itemL
     }
 
     fun updateList(newList: ArrayList<Model.Podcast>) {
+        itemList.clear()
         itemList = newList
         notifyDataSetChanged()
 

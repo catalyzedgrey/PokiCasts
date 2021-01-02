@@ -16,19 +16,20 @@ import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.adapter.EpisodeAdapter
 import com.grey.kotlinpractice.data.Model
 import com.squareup.picasso.Picasso
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
+import tw.ktrssreader.model.channel.ITunesChannelData
+import tw.ktrssreader.model.item.ITunesItemData
 
 
 class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: EpisodeAdapter
-    private var itemList = ArrayList<Model.Episode>()
-    private var podIndex: String = ""
+
+        private var itemList = ArrayList<Model.Episode>()
+//    lateinit var itemList: ArrayList<ITunesItemData>
+    private var feedUrl: String = ""
     private var artworkUrl: String = ""
+    private var collectionName: String = ""
     private val viewModel: HomeViewModel by activityViewModels()
     private lateinit var podIcon: ImageView
 
@@ -44,56 +45,63 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener {
 
         super.onViewCreated(view, savedInstanceState)
         val manager: RecyclerView.LayoutManager = LinearLayoutManager(view.context)
+        itemList = ArrayList()
         recyclerView = view.findViewById(R.id.recyclerView)
         recyclerView.layoutManager = manager
         adapter = EpisodeAdapter(view.context, itemList)
         adapter.setOnPlayButtonClickedListener(this)
         recyclerView.adapter = adapter
-
         podIcon = view.findViewById(R.id.mainpodIconControl)
 
         updateRecyclerViewResults()
-        observeRssData()
+        //observeRemoteEpisodeList()
+        observeLocalEpisodeList()
     }
+
     private fun updateRecyclerViewResults() {
-        if (podIndex != "") {
-            updateListing()
+        if (feedUrl != "") {
             Picasso.get().load(artworkUrl).resize(450, 450)
                 .into(podIcon)
+            adapter.artistName = collectionName
         }
     }
 
-    private fun observeRssData() {
+
+    private fun observeLocalEpisodeList() {
         val resultObserver = Observer<List<Model.Episode>> { result ->
             // Update the UI
+            if(result != null){
+                adapter.updateList(result as ArrayList<Model.Episode>)
+                itemList = result
+            }
 
-            adapter.updateList(result as ArrayList<Model.Episode>)
-            itemList = result
         }
-        viewModel.getEpisodeList(podIndex).observe(viewLifecycleOwner, resultObserver)
-
+        viewModel.getLocalEpisodeList(feedUrl).observe(viewLifecycleOwner, resultObserver)
     }
 
-    private fun updateListing() {
+
+//    private fun observeRemoteEpisodeList() {
+//        val resultObserver = Observer<ITunesChannelData> { result ->
+//            // Update the UI
+//            itemList = result.items as ArrayList<ITunesItemData>
+//            adapter.updateList(itemList)
+//
+//        }
+//        viewModel.getRemoteEpisodeList(feedUrl).observe(viewLifecycleOwner, resultObserver)
+//    }
 
 
-        //var podcast: Model.Podcast = res.results[podIndex.toInt()]
-
-
-//        viewModel.getXMLResult(podIndex.toInt())
-        //viewModel.getLocalXMLResult(podIndex)
-
-
-    }
-
-    fun updatePodcastIndex(index: String, artworkUrl: String) {
-        podIndex = index
+    fun updatePodcastIndex(feedUrl: String, artworkUrl: String, collectionName: String) {
+        this.feedUrl = feedUrl
         this.artworkUrl = artworkUrl
+        this.collectionName = collectionName
     }
 
     override fun sendPodcastUri(uri: String) {
         PodcastPlayer.preparePlayer(uri)
     }
+
+
 
 
 }

@@ -29,7 +29,7 @@ class HomeFragment : Fragment() {
     private val viewModel: HomeViewModel by activityViewModels()
 
     interface ItemClickedListener {
-        fun sendPodcastIndex(podcastPosIndex: String, artWork: String)
+        fun sendPodcastIndex(podcastPosIndex: String, artWork: String, collectionName: String)
     }
 
 
@@ -50,7 +50,7 @@ class HomeFragment : Fragment() {
 
 
         gridView.setOnItemClickListener{ _, _, position, _ ->
-            SendPodcastFeedUrl(itemList[position].feedUrl, itemList[position].artworkUrl600!!)
+            SendPodcastFeedUrl(itemList[position].feedUrl, itemList[position].artworkUrl600!!, itemList[position].collectionName!!)
         }
 
 
@@ -68,8 +68,8 @@ class HomeFragment : Fragment() {
         this.mCallback = callback
     }
 
-    fun SendPodcastFeedUrl(podcastPosIndex: String, artWork: String) {
+    fun SendPodcastFeedUrl(podcastPosIndex: String, artWorkUrl: String, collectionName: String) {
         //here you can get the text from the edit text or can use this method according to your need
-        mCallback.sendPodcastIndex(podcastPosIndex, artWork)
+        mCallback.sendPodcastIndex(podcastPosIndex, artWorkUrl, collectionName)
     }
 }
