@@ -1,6 +1,7 @@
 package com.grey.kotlinpractice.adapter
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,22 +23,36 @@ class EpisodeAdapter(
     private var itemList: ArrayList<Model.Episode>,
 ) : RecyclerView.Adapter<EpisodeAdapter.MyViewHolder>() {
     lateinit var mCallback: PlayButtonClickedListener
+    lateinit var episodeCallback: EpisodeClickedListener
     private var currentPosition = -1
     lateinit var artistName: String
 
 
     interface PlayButtonClickedListener {
-
         fun sendPodcastUri(uri: String)
+    }
+
+    interface EpisodeClickedListener {
+
+        fun sendPodcastEpisodeInfo(episode: Model.Episode)
     }
 
     fun setOnPlayButtonClickedListener(callback: PlayButtonClickedListener) {
         this.mCallback = callback
     }
 
+    fun setOnEpisodeClickedListener(callback: EpisodeClickedListener) {
+        this.episodeCallback = callback
+    }
+
     private fun sendPodcastEpisodeInfo(uri: String) {
         //here you can get the text from the edit text or can use this method according to your need
         mCallback.sendPodcastUri(uri)
+    }
+
+    private fun sendEpisodeInfo(episode: Model.Episode) {
+        //here you can get the text from the edit text or can use this method according to your need
+        episodeCallback.sendPodcastEpisodeInfo(episode)
     }
 
 
@@ -57,6 +72,7 @@ class EpisodeAdapter(
                 playBtn.setImageResource(R.drawable.ic_play_circle_filled_white_24dp)
             }
         }
+
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EpisodeAdapter.MyViewHolder {
@@ -74,7 +90,12 @@ class EpisodeAdapter(
 //        holder.uri = itemList[position].enclosure!!.url!!
         holder.uri = itemList[position].url!!
 
+        holder.itemView.setOnClickListener{
+            sendEpisodeInfo(itemList[position])
+        }
         //holder.uri = itemList[position].enclosure!!.url!!
+
+
 
 
         holder.playBtn.setOnClickListener {
@@ -90,10 +111,6 @@ class EpisodeAdapter(
         return itemList.size
     }
 
-//    fun updateList(newList: ArrayList<ITunesItemData>) {
-//        itemList = newList
-//        notifyDataSetChanged()
-//    }
 
 //    fun updateList(newList: ArrayList<ITunesItemData>) {
 //        itemList.clear()

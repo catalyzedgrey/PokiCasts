@@ -69,6 +69,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         return repository.getEpisodeListRemotely(url)
     }
 
+    fun unsubscribe(feedUrl: String){
+        repository.unsubscribeAndDeletePodcast(feedUrl)
+    }
+
 
     suspend fun getPod(url: String): Model.Podcast = withContext(Dispatchers.IO) {
         // do your network request logic here and return the result

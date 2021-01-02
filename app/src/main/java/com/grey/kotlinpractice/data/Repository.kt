@@ -39,18 +39,16 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
     }
 
 
-
-
     fun searchForPodcast(searchQuery: String): MutableLiveData<Model.Results> {
-        if(searchQuery != ""){
-            subscription = webservice.getResults(searchQuery, "podcast").subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
+        if (searchQuery != "") {
+            subscription =
+                webservice.getResults(searchQuery, "podcast").subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
         }
         return podcastSearchResultLiveData
     }
-
 
 
 //    fun getEpisodesList(feedUrl: String): MutableLiveData<List<Model.Episode>> {
@@ -67,7 +65,7 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
 //
 //    }
 
-    fun getSubscribedPodcastList(): MutableLiveData<List<Model.Podcast>>{
+    fun getSubscribedPodcastList(): MutableLiveData<List<Model.Podcast>> {
         coroutineScope.launch {
             subscribedPodcastListLiveData.postValue(podcastDao.getAll())
         }
@@ -75,13 +73,17 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
     }
 
     fun getEpisodeListLocally(feedUrl: String): MutableLiveData<List<Model.Episode>> {
-        if(feedUrl != ""){
+        if (feedUrl != "") {
             coroutineScope.launch {
                 val pod = podcastDao.findByFeedUrl(feedUrl)
                 val m: ITunesChannelData = Reader.read<ITunesChannelData>(pod.feedUrl)
 
                 val episodes: List<Model.Episode> =
-                    episodeDao.transformItunesDatatoEpisode(m.items!!, pod.uid, pod.collectionName!!)
+                    episodeDao.transformItunesDatatoEpisode(
+                        m.items!!,
+                        pod.uid,
+                        pod.collectionName!!
+                    )
                 episodeDao.insertAll(episodes)
                 episodeLiveList.postValue(episodes)
             }
@@ -90,17 +92,22 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
     }
 
     fun getEpisodeListRemotely(feedUrl: String): MutableLiveData<ITunesChannelData> {
-        if(feedUrl != ""){
+        if (feedUrl != "") {
             coroutineScope.launch {
                 remoteEpisodeListLiveData.postValue(
                     Reader.read<ITunesChannelData>(feedUrl)
                 )
             }
         }
-
         return remoteEpisodeListLiveData
     }
 
+    fun unsubscribeAndDeletePodcast(feedUrl: String) {
+        coroutineScope.launch {
+            podcastDao.delete(podcastDao.findByFeedUrl(feedUrl))
+            subscribedPodcastListLiveData.postValue(podcastDao.getAll())
+        }
+    }
 
     fun insertPodcastOnSubscribe(podcast: Model.Podcast) {
         coroutineScope.launch {
@@ -121,7 +128,6 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
     }
 
 
-
     fun deleteAllPodcastItems() {
         coroutineScope.launch {
             podcastDao.deleteAll()
@@ -130,7 +136,8 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
 
 
     fun dispose() {
-        subscription.dispose()
+        if(subscription.)
+        //subscription.dispose()
     }
 
 

@@ -27,7 +27,8 @@ import com.grey.kotlinpractice.data.AppDatabase
 import com.grey.kotlinpractice.databinding.ActivityMainBinding
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_main.view.*
-import kotlinx.android.synthetic.main.bottomsheet.*
+import kotlinx.android.synthetic.main.bottomsheet_player.*
+
 
 class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Player.EventListener,
     TimeBar.OnScrubListener {
