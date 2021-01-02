@@ -10,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.Player
 import com.grey.kotlinpractice.PodcastPlayer
 import com.grey.kotlinpractice.R
+import com.grey.kotlinpractice.data.Model
 import tw.ktrssreader.model.channel.ITunesChannelData
 import tw.ktrssreader.model.item.ITunesItem
 import tw.ktrssreader.model.item.ITunesItemData
@@ -17,7 +18,7 @@ import tw.ktrssreader.model.item.ITunesItemData
 
 class EpisodeAdapter(
     private val context: Context,
-    private var itemList: ArrayList<ITunesItemData>
+    private var itemList: ArrayList<Model.Episode>
 ) : RecyclerView.Adapter<EpisodeAdapter.MyViewHolder>() {
     lateinit var mCallback: PlayButtonClickedListener
     private var currentPosition = -1
@@ -73,14 +74,16 @@ class EpisodeAdapter(
 
     override fun onBindViewHolder(holder: EpisodeAdapter.MyViewHolder, position: Int) {
         PodcastPlayer.addListener(holder)
+
         holder.episodeReleaseDate.text = itemList[position].pubDate
         holder.episodeTitle.text = itemList[position].title
         holder.duration.text = itemList[position].duration
-        holder.uri = itemList[position].enclosure!!.url!!
+        holder.uri = itemList[position].url!!
+        //holder.uri = itemList[position].enclosure!!.url!!
 
 
         holder.playBtn.setOnClickListener {
-            sendPodcastEpisodeInfo(itemList[position].enclosure!!.url!!)
+            sendPodcastEpisodeInfo(itemList[position].url!!)
             PodcastPlayer.setArtistTitle(artistName)
             PodcastPlayer.setEpisodeTitle(holder.episodeTitle.text.toString())
         }
@@ -91,7 +94,12 @@ class EpisodeAdapter(
         return itemList.size
     }
 
-    fun updateList(newList: ArrayList<ITunesItemData>) {
+//    fun updateList(newList: ArrayList<ITunesItemData>) {
+//        itemList = newList
+//        notifyDataSetChanged()
+//    }
+
+        fun updateList(newList: ArrayList<Model.Episode>) {
         itemList = newList
         notifyDataSetChanged()
     }

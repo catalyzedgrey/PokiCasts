@@ -12,8 +12,7 @@
         android:queryBackground="@drawable/squaredrectangle"
         android:id="@+id/searchView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:queryHint="Search by city name" />
+        android:layout_height="wrap_content" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:background="@color/colorPrimary"

@@ -6,10 +6,7 @@ import com.grey.kotlinpractice.data.*
 import com.grey.kotlinpractice.di.component.DaggerViewModelComponent
 import com.grey.kotlinpractice.di.component.ViewModelComponent
 import io.reactivex.disposables.Disposable
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import tw.ktrssreader.model.channel.ITunesChannelData
+import kotlinx.coroutines.*
 import javax.inject.Inject
 
 
@@ -20,15 +17,10 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     private val injector: ViewModelComponent = DaggerViewModelComponent.builder()
         .networkModule(com.grey.kotlinpractice.di.module.NetworkModule).build()
 
-    var repository: Repository
-    lateinit var  data : LiveData<Model.Results>
-    var  rssData : LiveData<ITunesChannelData>? = null
-
-    lateinit var subscribedPodList: LiveData<List<Model.Podcast>>
-
+    private var repository: Repository
 
     var disposable: Disposable? = null
-    //private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     init {
         inject()
@@ -43,31 +35,15 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         }
     }
 
-    public fun loadResults(s: String) {
-        data = repository.getResult(s)
-
-//        subscription = itunesService.getResults("waypoint", "podcast").subscribeOn(Schedulers.io())
-//            .observeOn(AndroidSchedulers.mainThread())
-//            .subscribeOn(Schedulers.io())
-//            .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
-
-
-    }
-
-    fun getSubscribedPodcasts(){
-
-        subscribedPodList = repository.getAllSubscribed()
-    }
-
-    fun getXMLResult(index: Int){
-        rssData = repository.getXMLResult(index)
+    fun searchForPodcast(s: String): LiveData<Model.Results> {
+        return repository.searchForPodcast(s)
     }
 
 
-    //    fun getResults(): LiveData<Model.Results> {
-//
-////        return Repository.
-//    }
+    fun getSubscribedPodcasts(): LiveData<List<Model.Podcast>>{
+        return repository.getSubscribedPodcastList()
+    }
+
     override fun onCleared() {
         super.onCleared()
         // Dispose All your Subscriptions to avoid memory leaks
@@ -75,8 +51,23 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     }
 
 
-    fun subscribeToPodcast(pod: Model.Podcast){
+    fun subscribeToPodcast(pod: Model.Podcast) {
         repository.insertPodcastOnSubscribe(pod)
+//        val podcastDao = Repository.DatabaseHandler.db.podcastDao()
+//        coroutineScope.launch {
+//            subscribedPodList.postValue(podcastDao.getAll())
+//        }
     }
+
+    fun getEpisodeList(url: String): LiveData<List<Model.Episode>>{
+        return repository.getEpisodeListLocally(url)
+    }
+
+
+    suspend fun getPod(url: String): Model.Podcast = withContext(Dispatchers.IO) {
+        // do your network request logic here and return the result
+        repository.podcastDao.findByName(url)
+    }
+
 
 }

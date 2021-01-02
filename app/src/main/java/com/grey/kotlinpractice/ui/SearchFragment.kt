@@ -2,7 +2,6 @@ package com.grey.kotlinpractice.ui
 
 import android.graphics.Color
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -37,13 +36,13 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        viewModel.searchForPodcast("waypoint")
         searchView = view.findViewById(R.id.searchView)
         searchView.setOnClickListener { searchView.isIconified = false }
         changeTextColor()
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(s: String): Boolean {
-                viewModel.loadResults(s)
+                viewModel.searchForPodcast(s)
                 return true
             }
 
@@ -62,10 +61,20 @@ class SearchFragment : Fragment() {
         val resultObserver = Observer<Model.Results> { result ->
             // Update the UI
             adapter.updateList(result.results)
-            recyclerView.adapter = adapter
+
         }
 
-        viewModel.data.observe(viewLifecycleOwner, resultObserver)
+        viewModel.searchForPodcast("").observe(viewLifecycleOwner, resultObserver)
+
+//        val subscribedObserver = Observer<List<Model.Podcast>> { result ->
+//            // Update the UI
+//            if(result.isNotEmpty() || result.size != 0)
+//                adapter.updateList(result as ArrayList<Model.Podcast>)
+//                recyclerView.adapter = adapter
+//
+//        }
+//
+//        viewModel.subscribedPodList.observe(viewLifecycleOwner, subscribedObserver)
 
 
 

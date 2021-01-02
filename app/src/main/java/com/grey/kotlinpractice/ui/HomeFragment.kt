@@ -1,7 +1,6 @@
 package com.grey.kotlinpractice.ui
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -29,6 +28,11 @@ class HomeFragment : Fragment() {
     lateinit var adapter: HomeAdapter
     private val viewModel: HomeViewModel by activityViewModels()
 
+    interface ItemClickedListener {
+        fun sendPodcastIndex(podcastPosIndex: String, artWork: String)
+    }
+
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -39,69 +43,33 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.loadResults("waypoint")
+
         gridView = view.findViewById(R.id.home_grid)
         adapter = HomeAdapter(view.context, R.layout.home_list_item, itemList)
         gridView.adapter = adapter
 
 
         gridView.setOnItemClickListener{ _, _, position, _ ->
-            SendPodcastIndex(position.toString())
+            SendPodcastFeedUrl(itemList[position].feedUrl, itemList[position].artworkUrl600!!)
         }
-//        val manager: RecyclerView.LayoutManager = GridLayoutManager(view.context, 3)
-//        recyclerView = view.findViewById(R.id.home_grid)
-//        recyclerView.layoutManager = manager
-//        adapter = PodcastHomeAdapter(view.context, itemList)
-//        recyclerView.adapter = adapter
-
-
-
-
-
-//        recyclerView.setOnClickListener {
-//
-//            Log.v("testing", "touched")
-//        }
 
 
         val gridObserver = Observer<List<Model.Podcast>> { result ->
             // Update the UI
             itemList = result as ArrayList<Model.Podcast>
-            adapter.updateList(itemList)
-            gridView.adapter = adapter
-
-//            recyclerView.adapter = adapter
-
-
+            adapter.updateList(result as ArrayList<Model.Podcast>)
         }
-        viewModel.subscribedPodList.observe(viewLifecycleOwner, gridObserver)
+        viewModel.getSubscribedPodcasts().observe(viewLifecycleOwner, gridObserver)
 
 
     }
 
-
-//    @JvmName("getAdapter1")
-//    fun getAdapter(): PodcastHomeAdapter {
-//        if(adapter!= null)
-//            return adapter
-//        return PodcastHomeAdapter(activity?.baseContext, itemList)
-//    }
-
-
-    override fun onActivityCreated(savedInstanceState: Bundle?) {
-        super.onActivityCreated(savedInstanceState)
-
-        //tvCommon.text = "home frag"
-        //commonLayout.setBackgroundColor(resources.getColor(android.R.color.darker_gray))
-    }
     fun setOnItemClickedListener(callback: ItemClickedListener) {
         this.mCallback = callback
     }
-    interface ItemClickedListener {
-        fun sendPodcastIndex(podcastPosIndex: String)
-    }
-    fun SendPodcastIndex(podcastPosIndex: String) {
+
+    fun SendPodcastFeedUrl(podcastPosIndex: String, artWork: String) {
         //here you can get the text from the edit text or can use this method according to your need
-        mCallback.sendPodcastIndex(podcastPosIndex)
+        mCallback.sendPodcastIndex(podcastPosIndex, artWork)
     }
 }

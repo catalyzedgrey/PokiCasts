@@ -21,4 +21,10 @@ interface PodcastDao {
 
     @Delete
     fun delete(podcast: Model.Podcast)
+
+    @Query("DELETE FROM podcast")
+    fun deleteAll()
+
+    @Query("SELECT * FROM podcast WHERE feedUrl IN (:feedUrl)")
+    fun findByFeedUrl(feedUrl: String): Model.Podcast
 }

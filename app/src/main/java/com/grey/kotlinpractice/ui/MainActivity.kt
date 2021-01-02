@@ -115,20 +115,16 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         }
     }
 
-    override fun sendPodcastIndex(podcastPosIndex: String) {
+    override fun sendPodcastIndex(podcastPosIndex: String, artworkUrl: String) {
 
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, episodeFragment, episodeFragment.javaClass.getSimpleName())
             .addToBackStack("tag")
             .commit()
-        episodeFragment.updatePodcastIndex(podcastPosIndex)
+        episodeFragment.updatePodcastIndex(podcastPosIndex, artworkUrl)
     }
 
-    override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-        super.onPlayWhenReadyChanged(playWhenReady, playbackState)
-
-    }
 
     private fun initUi() {
         AppDatabase.DatabaseProvider.context = applicationContext

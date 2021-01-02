@@ -1,78 +1,111 @@
 package com.grey.kotlinpractice.data
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import tw.ktrssreader.Reader
 import tw.ktrssreader.model.channel.*
-import java.nio.charset.Charset
-import java.util.*
 import javax.inject.Inject
-import javax.inject.Singleton
-import kotlin.collections.ArrayList
 
 
 class Repository @Inject constructor(private val webservice: ItunesService) {
 
     private lateinit var subscription: Disposable
-    private val mutableLiveData: MutableLiveData<Model.Results> by lazy {
+    val podcastDao = DatabaseHandler.db.podcastDao()
+    val episodeDao = DatabaseHandler.db.episodeDao()
+
+    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+    private val podcastSearchResultLiveData: MutableLiveData<Model.Results> by lazy {
         MutableLiveData<Model.Results>()
     }
 
-    private val subscribedPodcasts: MutableLiveData<List<Model.Podcast>> by lazy {
-        MutableLiveData<List<Model.Podcast>>()
-    }
 
     private val mutableRSSData: MutableLiveData<ITunesChannelData> by lazy {
         MutableLiveData<ITunesChannelData>()
     }
 
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
-
-    //region commented getUser
-//    fun getUser(searchQuery: String): LiveData<Model.Results> {
-//        // This isn't an optimal implementation. We'll fix it later.
-//        val data = MutableLiveData<Model.Results>()
-//        webservice.getResults(searchQuery).enqueue(object : Callback<Model.Results> {
-//            override fun onResponse(call: Call<Model.Results>, response: Response<Model.Results>) {
-//                data.value = response.body()
-//            }
-//
-//            // Error case is left out for brevity.
-//            override fun onFailure(call: Call<Model.Results>, t: Throwable) {
-//                TODO()
-//            }
-//        })
-//        return data
-//    }
-    //endregion
-
-    fun getResult(searchQuery: String): MutableLiveData<Model.Results> {
-        subscription = webservice.getResults(searchQuery, "podcast").subscribeOn(Schedulers.io())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeOn(Schedulers.io())
-            .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
-        return mutableLiveData
+    private val subscribedPodcastListLiveData: MutableLiveData<List<Model.Podcast>> by lazy {
+        MutableLiveData<List<Model.Podcast>>()
     }
 
-    fun getXMLResult(index: Int): MutableLiveData<ITunesChannelData> {
+    val episodeLiveList: MutableLiveData<List<Model.Episode>> by lazy {
+        MutableLiveData<List<Model.Episode>>()
+    }
+
+
+
+
+    fun searchForPodcast(searchQuery: String): MutableLiveData<Model.Results> {
+        if(searchQuery != ""){
+            subscription = webservice.getResults(searchQuery, "podcast").subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .subscribe({ response -> onResponse(response) }, { t -> onFailure(t) })
+        }
+        return podcastSearchResultLiveData
+    }
+
+    fun getRemoteRssResult(index: Int): MutableLiveData<ITunesChannelData> {
         coroutineScope.launch {
             mutableRSSData.postValue(
-                Reader.read<ITunesChannelData>(mutableLiveData.value!!.results[index].feedUrl)
+                Reader.read<ITunesChannelData>(podcastSearchResultLiveData.value!!.results[index].feedUrl)
             )
         }
         return mutableRSSData
     }
+
+//    fun getEpisodesList(feedUrl: String): MutableLiveData<List<Model.Episode>> {
+//        coroutineScope.launch {
+//            val pod = podcastDao.findByFeedUrl(feedUrl)
+//            val m: ITunesChannelData = Reader.read<ITunesChannelData>(pod.feedUrl)
+//
+//            val episodes: List<Model.Episode> =
+//                episodeDao.transformItunesDatatoEpisode(m.items!!, pod.uid, pod.collectionName!!)
+//            episodeDao.insertAll(episodes)
+//            episodeLiveList.postValue(episodes)
+//        }
+//        return episodeLiveList
+//
+//    }
+
+    fun getSubscribedPodcastList(): MutableLiveData<List<Model.Podcast>>{
+        coroutineScope.launch {
+            subscribedPodcastListLiveData.postValue(podcastDao.getAll())
+        }
+        return subscribedPodcastListLiveData
+    }
+
+    fun getEpisodeListLocally(feedUrl: String): MutableLiveData<List<Model.Episode>> {
+        if(feedUrl != ""){
+            coroutineScope.launch {
+                val pod = podcastDao.findByFeedUrl(feedUrl)
+                val m: ITunesChannelData = Reader.read<ITunesChannelData>(pod.feedUrl)
+
+                val episodes: List<Model.Episode> =
+                    episodeDao.transformItunesDatatoEpisode(m.items!!, pod.uid, pod.collectionName!!)
+                episodeDao.insertAll(episodes)
+                episodeLiveList.postValue(episodes)
+            }
+        }
+
+        return episodeLiveList
+    }
+
+
+    fun insertPodcastOnSubscribe(podcast: Model.Podcast) {
+        coroutineScope.launch {
+            podcast.isSubscribed = true
+            podcastDao.insertAll(podcast)
+            subscribedPodcastListLiveData.postValue(podcastDao.getAll())
+        }
+    }
+
 
     private fun onFailure(t: Throwable?) {
         //TODO("Not yet implemented")
@@ -80,41 +113,25 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
     }
 
     private fun onResponse(response: Model.Results) {
-        mutableLiveData.value = response
-//        val data = MutableLiveData<Model.Results>()
-//        data.value = response
-
+        podcastSearchResultLiveData.value = response
     }
 
 
-    fun getAllSubscribed(): LiveData<List<Model.Podcast>>{
-        val podcastDao = DatabaseHandler.db.podcastDao()
-        coroutineScope.launch {
 
-             subscribedPodcasts.postValue(podcastDao.getAll())
-        }
-        return  subscribedPodcasts
-    }
-
-    fun insertPodcastOnSubscribe(podcast: Model.Podcast){
-        val podcastDao = DatabaseHandler.db.podcastDao()
+    fun deleteAllPodcastItems() {
         coroutineScope.launch {
-            podcastDao.insertAll(podcast)
+            podcastDao.deleteAll()
         }
     }
 
 
-
-    fun dispose(){
+    fun dispose() {
         subscription.dispose()
     }
 
 
-    private object  DatabaseHandler {
+    object DatabaseHandler {
         var db: AppDatabase = AppDatabase.DatabaseProvider.getInstance()
         private val coroutineScope = CoroutineScope(Dispatchers.IO)
-
-
-
     }
 }

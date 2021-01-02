@@ -7,10 +7,7 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.Expose
 
 import com.google.gson.annotations.SerializedName
-import tw.ktrssreader.annotation.OrderType
-import tw.ktrssreader.annotation.RssAttribute
-import tw.ktrssreader.annotation.RssTag
-import java.io.Serializable
+import tw.ktrssreader.model.item.ITunesItemData
 
 
 object Model {
@@ -20,7 +17,7 @@ object Model {
 
     @Entity
     data class Podcast(
-        @PrimaryKey (autoGenerate = true) val uid: Int,
+        @PrimaryKey(autoGenerate = true) val uid: Int,
         @ColumnInfo val artistName: String,
         @ColumnInfo val feedUrl: String,
         @ColumnInfo
@@ -38,7 +35,9 @@ object Model {
         @ColumnInfo
         @SerializedName("releaseDate")
         @Expose
-        public val releaseDate: String? = null
+        public val releaseDate: String? = null,
+        @ColumnInfo
+        public var isSubscribed: Boolean = false
     )
 
 
@@ -53,14 +52,17 @@ object Model {
         ]
     )
     data class Episode(
-        @PrimaryKey val id: Int,
-        @ColumnInfo val title: String,
-        @ColumnInfo val url: String,
-        @ColumnInfo val description: String,
-        @ColumnInfo val duration: String,
-        @ColumnInfo val pubDate: String,
-        @ColumnInfo val podId: String
-    )
+        @ColumnInfo val title: String?,
+        @ColumnInfo val url: String?,
+        @ColumnInfo val description: String?,
+        @ColumnInfo val duration: String?,
+        @ColumnInfo val pubDate: String?,
+        @ColumnInfo val podId: Int?,
+        val collectionName: String?
+    ){
+        @PrimaryKey(autoGenerate = true)
+        var id: Int = 0
+    }
 
 
 }

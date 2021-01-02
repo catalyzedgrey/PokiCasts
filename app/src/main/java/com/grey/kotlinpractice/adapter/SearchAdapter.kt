@@ -11,12 +11,17 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.grey.kotlinpractice.HomeViewModel
 import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.data.Model
 import com.grey.kotlinpractice.data.PodcastDao
+import com.grey.kotlinpractice.data.Repository
 import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class SearchAdapter(
     private val context: Context,
@@ -63,24 +68,36 @@ class SearchAdapter(
 
     //Replace the contents of a view
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
-        val url: String = allResults[position].artworkUrl600!!
-        Picasso.get().load(url).resize(200,200).into(holder.podIcon)
+
+        Picasso.get().load(allResults[position].artworkUrl600!!).resize(200,200).into(holder.podIcon)
         holder.artistName.text = allResults[position].artistName
         holder.title.text = allResults[position].collectionName
-        val r = viewModel.repository.getAllSubscribed()
-        for(i in r.s){
-            if
+
+        val podcastDao = Repository.DatabaseHandler.db.podcastDao()
+        val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+        coroutineScope.launch {
+            val pod: Model.Podcast? = podcastDao.findByFeedUrl(allResults[position].feedUrl)
+
+            if(pod != null && allResults[position].feedUrl == pod.feedUrl)
+                holder.subscribeBtn.setImageResource(R.drawable.ic_baseline_check_circle_24)
         }
 
+
+
+
+
+
         holder.subscribeBtn.setOnClickListener{
+            holder.subscribeBtn.setImageResource(R.drawable.ic_baseline_check_circle_24)
             //sendPodcastInfo(Model.Podcast())
             viewModel.subscribeToPodcast(allResults[position])
-            viewModel.getSubscribedPodcasts()
+
 
         }
     }
 
-    fun ()
+
 
     override fun getItemCount(): Int {
         return allResults.size
