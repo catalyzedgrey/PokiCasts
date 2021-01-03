@@ -4,9 +4,6 @@ package com.grey.kotlinpractice.ui
 //import com.grey.kotlinpractice.di.component.ContextComponent
 //import com.grey.kotlinpractice.di.component.DaggerContextComponent
 import android.os.Bundle
-import android.os.Handler
-import android.view.DragEvent
-import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -45,6 +42,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     lateinit var imgViewSheet: ImageView
     lateinit var defaultTimeBar: DefaultTimeBar
+    lateinit var playerView: StyledPlayerControlView
+
 
     private val viewModel: HomeViewModel by viewModels()
 
@@ -62,8 +61,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
                 .commit()
         }
 
-        initPodcastPlayer()
         initUi()
+        initPodcastPlayer()
         handleBottomNavSwitching()
 
     }
@@ -116,7 +115,11 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         }
     }
 
-    override fun sendPodcastIndex(podcastPosIndex: String, artworkUrl: String, collectionName: String) {
+    override fun sendPodcastIndex(
+        podcastPosIndex: String,
+        artworkUrl: String,
+        collectionName: String
+    ) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.container, episodeFragment, episodeFragment.javaClass.getSimpleName())
             .addToBackStack("tag")
@@ -125,13 +128,30 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
 
+    fun collapseBottomSheet(){
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+    }
+
+    fun expandBottomSheet(){
+        bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+    }
+
+    fun collapseBottomNavigationView(){
+        bottomNavigationView.visibility = View.GONE
+        playerView.visibility = View.GONE
+    }
+
+    fun expandBottomNavigationView(){
+        bottomNavigationView.visibility = View.VISIBLE
+        playerView.visibility = View.VISIBLE
+    }
+
     private fun initUi() {
         AppDatabase.DatabaseProvider.context = applicationContext
         bottomNavigationView = binding.root.findViewById(R.id.bottomNavigationView)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
         imgViewSheet = binding.root.findViewById<ImageView>(R.id.mainpodIconControl)
-        binding.root.findViewById<StyledPlayerControlView>(R.id.player_control).player =
-            PodcastPlayer.getPlayer()
+
         defaultTimeBar = binding.root.findViewById<DefaultTimeBar>(R.id.exo_progress)
         defaultTimeBar.addListener(this)
 
@@ -144,7 +164,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
                 override fun onStateChanged(bottomSheet: View, newState: Int) {
                     if (newState == BottomSheetBehavior.STATE_COLLAPSED) {
-                        bottomNavigationView.visibility = View.VISIBLE
+                        expandBottomNavigationView()
 
                     }
                 }
@@ -153,10 +173,11 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         bottomSheetBehavior.addBottomSheetCallback(bottomSheetBehaviorCallback)
         imgViewSheet.setOnClickListener {
             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                collapseBottomSheet()
             } else {
-                bottomSheetBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-                bottomNavigationView.visibility = View.GONE
+                expandBottomSheet()
+                collapseBottomNavigationView()
+
             }
         }
 
@@ -165,8 +186,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     private fun initPodcastPlayer() {
         PodcastPlayer.initPlayer(applicationContext)
-        val playerView: StyledPlayerControlView =
-            findViewById<StyledPlayerControlView>(R.id.exoplayer)
+        playerView = binding.root.findViewById<StyledPlayerControlView>(R.id.exoplayer)
         playerView.player = PodcastPlayer.getPlayer()
         PodcastPlayer.addListener(this)
     }
@@ -174,8 +194,9 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     override fun onBackPressed() {
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)
             bottomSheetBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-
-        else
+        else if (viewModel.isEpisodePreviewExpanded) {
+            episodeFragment.collapseBottomSheet()
+        } else
             super.onBackPressed()
 
     }
@@ -185,7 +206,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         if (isPlaying) {
             val epTitle = PodcastPlayer.getEpisodeTitle()
             val artName = PodcastPlayer.getArtistTitle()
-            findViewById<TextView>(R.id.episode_title_sheet).text = epTitle
+            findViewById<TextView>(R.id.episode_title_sheet_preview).text = epTitle
             findViewById<TextView>(R.id.artist_title_sheet).text = artName
 
         }

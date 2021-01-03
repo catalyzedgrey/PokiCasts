@@ -136,7 +136,8 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
 
 
     fun dispose() {
-        if(subscription.)
+
+
         //subscription.dispose()
     }
 

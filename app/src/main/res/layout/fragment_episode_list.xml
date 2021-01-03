@@ -13,17 +13,25 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
+
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/collapse_toolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             app:layout_scrollFlags="scroll|enterAlways">
 
+            <View
+                android:id="@+id/accent_toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                />
+
             <ImageView
                 android:id="@+id/mainpodIconControl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
                 app:layout_constraintBottom_toTopOf="@id/recyclerView"
@@ -42,6 +50,12 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
 
     </com.google.android.material.appbar.AppBarLayout>
+
+    <View
+        android:layout_gravity="bottom"
+        android:background="#000"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"/>
 
     <include
         layout="@layout/bottomsheet_episode_preview" />

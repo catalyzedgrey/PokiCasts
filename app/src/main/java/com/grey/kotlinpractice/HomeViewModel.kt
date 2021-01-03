@@ -17,11 +17,12 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 
     private val injector: ViewModelComponent = DaggerViewModelComponent.builder()
         .networkModule(com.grey.kotlinpractice.di.module.NetworkModule).build()
-
     private var repository: Repository
 
-    var disposable: Disposable? = null
-    private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    //private val coroutineScope = CoroutineScope(Dispatchers.IO)
+
+    var isPlayerfExpanded: Boolean = false
+    var isEpisodePreviewExpanded: Boolean = false
 
     init {
         inject()

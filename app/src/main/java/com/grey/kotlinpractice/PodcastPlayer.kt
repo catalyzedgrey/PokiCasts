@@ -71,7 +71,6 @@ object PodcastPlayer : Player.EventListener {
     }
 
     fun getPlayer(): SimpleExoPlayer {
-
         return exoPlayer
     }
 

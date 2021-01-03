@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView
-
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/bottomsheet_preview"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
+    app:behavior_hideable="true"
     android:background="#232428"
     app:behavior_peekHeight="0dp"
     app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
@@ -16,6 +16,14 @@
         android:layout_height="wrap_content"
         >
 
+        <ImageView
+            android:id="@+id/collapse_preview"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:src="@drawable/ic_baseline_expand_more_24"
+            app:layout_constraintTop_toTopOf="@id/pod_icon"
+            app:layout_constraintEnd_toStartOf="@id/pod_icon"/>
 
         <ImageView
             android:id="@+id/pod_icon"
@@ -28,13 +36,13 @@
 
 
         <TextView
-            android:id="@+id/episode_title_sheet"
+            android:id="@+id/episode_title_sheet_preview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
-            android:text="placeholder"
             android:textColor="@color/colorLightAccent"
             android:textSize="20sp"
+            android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/pod_icon" />
@@ -43,13 +51,12 @@
             android:id="@+id/artist_title_sheet"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="placeholder"
+            android:textAlignment="center"
             android:textColor="@color/colorLightAccent"
             android:textSize="20sp"
-
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/episode_title_sheet" />
+            app:layout_constraintTop_toBottomOf="@id/episode_title_sheet_preview" />
 
 
         <ImageView
@@ -59,7 +66,8 @@
             android:src="@drawable/exo_styled_controls_play"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/artist_title_sheet" />
+            app:layout_constraintTop_toBottomOf="@id/artist_title_sheet"
+            android:contentDescription="play button" />
 
         <View
             android:layout_width="wrap_content"
@@ -108,6 +116,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/duration"
+            android:autoLink="web"
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
