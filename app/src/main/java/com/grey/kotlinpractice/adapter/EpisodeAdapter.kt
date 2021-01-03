@@ -1,7 +1,6 @@
 package com.grey.kotlinpractice.adapter
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,9 +11,6 @@ import com.google.android.exoplayer2.Player
 import com.grey.kotlinpractice.PodcastPlayer
 import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.data.Model
-import tw.ktrssreader.model.channel.ITunesChannelData
-import tw.ktrssreader.model.item.ITunesItem
-import tw.ktrssreader.model.item.ITunesItemData
 
 
 class EpisodeAdapter(
@@ -25,7 +21,7 @@ class EpisodeAdapter(
     lateinit var mCallback: PlayButtonClickedListener
     lateinit var episodeCallback: EpisodeClickedListener
     private var currentPosition = -1
-    lateinit var artistName: String
+    //lateinit var artistName: String
 
 
     interface PlayButtonClickedListener {
@@ -101,8 +97,9 @@ class EpisodeAdapter(
         holder.playBtn.setOnClickListener {
 //            sendPodcastEpisodeInfo(itemList[position].enclosure!!.url!!)
             sendPodcastEpisodeInfo(itemList[position].url!!)
-            PodcastPlayer.setArtistTitle(artistName)
+            PodcastPlayer.setArtistTitle(itemList[position].collectionName!!)
             PodcastPlayer.setEpisodeTitle(holder.episodeTitle.text.toString())
+            PodcastPlayer.artworkUrl = itemList[position].imageUrl!!
         }
     }
 

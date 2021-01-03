@@ -3,6 +3,9 @@ package com.grey.kotlinpractice.ui
 //import com.grey.kotlinpractice.adapter.PodcastHomeAdapter
 //import com.grey.kotlinpractice.di.component.ContextComponent
 //import com.grey.kotlinpractice.di.component.DaggerContextComponent
+import android.app.Notification
+import android.app.PendingIntent
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -10,8 +13,10 @@ import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.app.NotificationCompat
 import androidx.fragment.app.Fragment
 import com.google.android.exoplayer2.Player
+import com.google.android.exoplayer2.offline.DownloadService.startForeground
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.ui.StyledPlayerControlView
 import com.google.android.exoplayer2.ui.TimeBar
@@ -124,6 +129,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
             .replace(R.id.container, episodeFragment, episodeFragment.javaClass.getSimpleName())
             .addToBackStack("tag")
             .commit()
+        PodcastPlayer.artworkUrl = artworkUrl
+        PodcastPlayer.loadBitmap()
         episodeFragment.updatePodcastIndex(podcastPosIndex, artworkUrl, collectionName)
     }
 
@@ -185,10 +192,15 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
     private fun initPodcastPlayer() {
+        //val intent = Intent(this, PodcastPlayer::class.java)
+
+        //startService(intent)
         PodcastPlayer.initPlayer(applicationContext)
         playerView = binding.root.findViewById<StyledPlayerControlView>(R.id.exoplayer)
         playerView.player = PodcastPlayer.getPlayer()
         PodcastPlayer.addListener(this)
+
+
     }
 
     override fun onBackPressed() {
@@ -209,11 +221,29 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
             findViewById<TextView>(R.id.episode_title_sheet_preview).text = epTitle
             findViewById<TextView>(R.id.artist_title_sheet).text = artName
 
+//            val pendingIntent: PendingIntent =
+//                Intent(this, PodcastPlayer::class.java).let { notificationIntent ->
+//                    PendingIntent.getActivity(this, 0, notificationIntent, 0)
+//                }
+//
+//            val notification: Notification = NotificationCompat.Builder(this, )
+//                .setContentTitle(getText(R.string.notification_title))
+//                .setContentText(getText(R.string.notification_message))
+//                .setSmallIcon(R.drawable.icon)
+//                .setContentIntent(pendingIntent)
+//                .setTicker(getText(R.string.ticker_text))
+//                .build()
+//
+//// Notification ID cannot be 0.
+//            startForeground(ONGOING_NOTIFICATION_ID, notification)
+
+
         }
     }
 
     override fun onStop() {
         PodcastPlayer.release()
+        PodcastPlayer.onDestroy()
         super.onStop()
     }
 

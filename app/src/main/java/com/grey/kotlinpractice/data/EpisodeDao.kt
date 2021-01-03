@@ -27,7 +27,7 @@ interface EpisodeDao {
     @Query("DELETE FROM episode")
     fun deleteAll()
 
-    fun transformItunesDatatoEpisode(itunesItemData:  List<ITunesItemData>, podId: Int, podName: String): List<Model.Episode>{
+    fun transformItunesDatatoEpisode(itunesItemData:  List<ITunesItemData>, podId: Int, podName: String, artworkUrl: String): List<Model.Episode>{
         val episodes: ArrayList<Model.Episode> = ArrayList()
         for(item in itunesItemData){
             val e = Model.Episode(
@@ -37,7 +37,8 @@ interface EpisodeDao {
                 item.duration,
                 item.pubDate,
                 podId,
-                podName
+                podName,
+                artworkUrl
             )
             episodes.add(e)
         }

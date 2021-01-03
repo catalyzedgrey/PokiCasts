@@ -58,7 +58,8 @@ object Model {
         @ColumnInfo val duration: String?,
         @ColumnInfo val pubDate: String?,
         @ColumnInfo val podId: Int?,
-        val collectionName: String?
+        val collectionName: String?,
+        val imageUrl: String?
     ){
         @PrimaryKey(autoGenerate = true)
         var id: Int = 0

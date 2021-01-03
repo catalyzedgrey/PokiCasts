@@ -77,12 +77,13 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
             coroutineScope.launch {
                 val pod = podcastDao.findByFeedUrl(feedUrl)
                 val m: ITunesChannelData = Reader.read<ITunesChannelData>(pod.feedUrl)
-
+                pod.artworkUrl600
                 val episodes: List<Model.Episode> =
                     episodeDao.transformItunesDatatoEpisode(
                         m.items!!,
                         pod.uid,
-                        pod.collectionName!!
+                        pod.collectionName!!,
+                        pod.artworkUrl600!!
                     )
                 episodeDao.insertAll(episodes)
                 episodeLiveList.postValue(episodes)

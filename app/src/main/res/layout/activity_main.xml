@@ -38,6 +38,8 @@
             android:layout_height="wrap_content"
             app:show_timeout="0"
             app:controller_layout_id="@layout/custom_exoplayer_controller"
+            app:fastforward_increment="10000"
+            app:rewind_increment="10000"
             />
 
     </FrameLayout>

@@ -194,14 +194,12 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
             val vibrantSwatch = palette.vibrantSwatch
             accentbg.setBackgroundColor(
                 darkVibrantSwatch?.rgb ?: darkMutedSwatch?.rgb ?: mutedSwatch?.rgb
-                ?: lightMutedSwatch?.rgb ?: lightVibrantSwatch?.rgb ?: vibrantSwatch?.rgb?: palette.dominantSwatch!!.rgb
+                ?: lightMutedSwatch?.rgb ?: vibrantSwatch?.rgb?: lightVibrantSwatch?.rgb ?: palette.dominantSwatch!!.rgb
             )
-
-
 
             playBtn.setColorFilter(
                 darkVibrantSwatch?.rgb ?: darkMutedSwatch?.rgb ?: mutedSwatch?.rgb
-                ?: lightMutedSwatch?.rgb ?: lightVibrantSwatch?.rgb ?: vibrantSwatch?.rgb?: palette.dominantSwatch!!.rgb
+                ?: lightMutedSwatch?.rgb ?: vibrantSwatch?.rgb?: lightVibrantSwatch?.rgb ?: palette.dominantSwatch!!.rgb
             )
 
             //region trying out different swatches

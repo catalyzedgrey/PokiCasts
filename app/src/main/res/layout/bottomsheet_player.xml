@@ -51,7 +51,9 @@
         android:layout_height="wrap_content"
         app:controller_layout_id="@layout/custom_exoplayer_controller_full"
         app:layout_constraintTop_toBottomOf="@id/artist_title_sheet"
-        app:show_timeout="0" />
+        app:show_timeout="0"
+        app:fastforward_increment="10000"
+        app:rewind_increment="10000"/>
 
     <View
         android:id="@+id/bottomview"
