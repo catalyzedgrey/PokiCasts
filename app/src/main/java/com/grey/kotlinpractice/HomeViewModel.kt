@@ -24,10 +24,13 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     var isPlayerfExpanded: Boolean = false
     var isEpisodePreviewExpanded: Boolean = false
 
+    lateinit var currentEpisode: Model.Episode
+
     init {
         inject()
         repository = Repository_Factory.newInstance(itunesService)
         getSubscribedPodcasts()
+
 
     }
 

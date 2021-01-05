@@ -8,7 +8,7 @@ import android.widget.ImageView
 import androidx.fragment.app.Fragment
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.StyledPlayerControlView
-import com.grey.kotlinpractice.PodcastPlayer
+import com.grey.kotlinpractice.PodcastPlayerService
 import com.grey.kotlinpractice.R
 
 class SettingsFragment : Fragment(), Player.EventListener {
@@ -27,8 +27,8 @@ class SettingsFragment : Fragment(), Player.EventListener {
         super.onViewCreated(view, savedInstanceState)
         var playerView: StyledPlayerControlView = view.findViewById<StyledPlayerControlView>(R.id.player_control)
 
-        playerView.player= PodcastPlayer.getPlayer()
-        PodcastPlayer.addListener(this)
+        //playerView.player= PodcastPlayerService.getPlayer()
+        //PodcastPlayerService.addListener(this)
         view.findViewById<ImageView>(R.id.pod_icon).setImageResource(R.drawable.waypoint)
     }
 

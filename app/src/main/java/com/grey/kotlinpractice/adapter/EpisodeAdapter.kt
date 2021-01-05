@@ -8,7 +8,8 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.Player
-import com.grey.kotlinpractice.PodcastPlayer
+import com.grey.kotlinpractice.HomeViewModel
+import com.grey.kotlinpractice.PodcastPlayerService
 import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.data.Model
 
@@ -17,10 +18,11 @@ class EpisodeAdapter(
     private val context: Context,
 //    private var itemList: ArrayList<ITunesItemData>,
     private var itemList: ArrayList<Model.Episode>,
+    private var podcastPlayerService: PodcastPlayerService
 ) : RecyclerView.Adapter<EpisodeAdapter.MyViewHolder>() {
     lateinit var mCallback: PlayButtonClickedListener
     lateinit var episodeCallback: EpisodeClickedListener
-    private var currentPosition = -1
+    var currentPosition = -1
     //lateinit var artistName: String
 
 
@@ -52,25 +54,6 @@ class EpisodeAdapter(
     }
 
 
-    class MyViewHolder(var view: View) : RecyclerView.ViewHolder(view), Player.EventListener {
-        val episodeReleaseDate: TextView = view.findViewById(R.id.rel_date)
-        val episodeTitle: TextView = view.findViewById(R.id.episode_title)
-        val duration: TextView = view.findViewById(R.id.duration)
-        val playBtn: ImageView = view.findViewById(R.id.play_btn)
-        var uri: String = ""
-
-
-        override fun onIsPlayingChanged(isPlaying: Boolean) {
-            super.onIsPlayingChanged(isPlaying)
-            if (isPlaying && uri == PodcastPlayer.getCurrentUri()) {
-                playBtn.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp)
-            } else if(uri == PodcastPlayer.getCurrentUri()){
-                playBtn.setImageResource(R.drawable.ic_play_circle_filled_white_24dp)
-            }
-        }
-
-    }
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EpisodeAdapter.MyViewHolder {
         return MyViewHolder(
             LayoutInflater.from(parent.context).inflate(R.layout.podcast_list_item, parent, false)
@@ -78,7 +61,8 @@ class EpisodeAdapter(
     }
 
     override fun onBindViewHolder(holder: EpisodeAdapter.MyViewHolder, position: Int) {
-        PodcastPlayer.addListener(holder)
+
+        podcastPlayerService.addListener(holder)
 
         holder.episodeReleaseDate.text = itemList[position].pubDate
         holder.episodeTitle.text = itemList[position].title
@@ -86,20 +70,20 @@ class EpisodeAdapter(
 //        holder.uri = itemList[position].enclosure!!.url!!
         holder.uri = itemList[position].url!!
 
-        holder.itemView.setOnClickListener{
+        holder.itemView.setOnClickListener {
             sendEpisodeInfo(itemList[position])
         }
         //holder.uri = itemList[position].enclosure!!.url!!
 
 
-
-
         holder.playBtn.setOnClickListener {
+            currentPosition = position
+            holder.podcastPlayerService = podcastPlayerService
 //            sendPodcastEpisodeInfo(itemList[position].enclosure!!.url!!)
             sendPodcastEpisodeInfo(itemList[position].url!!)
-            PodcastPlayer.setArtistTitle(itemList[position].collectionName!!)
-            PodcastPlayer.setEpisodeTitle(holder.episodeTitle.text.toString())
-            PodcastPlayer.artworkUrl = itemList[position].imageUrl!!
+            podcastPlayerService.artistTitle = itemList[position].collectionName!!
+            podcastPlayerService.episodeTitle = holder.episodeTitle.text.toString()
+            podcastPlayerService.artworkUrl = itemList[position].imageUrl!!
         }
     }
 
@@ -122,6 +106,26 @@ class EpisodeAdapter(
         notifyDataSetChanged()
     }
 
+    class MyViewHolder(var view: View) : RecyclerView.ViewHolder(view), Player.EventListener {
+        val episodeReleaseDate: TextView = view.findViewById(R.id.rel_date)
+        val episodeTitle: TextView = view.findViewById(R.id.episode_title)
+        val duration: TextView = view.findViewById(R.id.duration)
+        val playBtn: ImageView = view.findViewById(R.id.play_btn)
+        var uri: String = ""
+        var podcastPlayerService: PodcastPlayerService? = null
 
+
+        override fun onIsPlayingChanged(isPlaying: Boolean) {
+            super.onIsPlayingChanged(isPlaying)
+            if (isPlaying && uri == podcastPlayerService?.currentUri) {
+                playBtn.setImageResource(R.drawable.ic_pause_circle_filled_white_24dp)
+            } else if(!isPlaying && uri == podcastPlayerService?.currentUri){
+                playBtn.setImageResource(R.drawable.ic_play_circle_filled_white_24dp)
+            }
+
+
+        }
+
+    }
 
 }

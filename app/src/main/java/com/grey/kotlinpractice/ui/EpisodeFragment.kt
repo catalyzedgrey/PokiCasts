@@ -1,7 +1,12 @@
 package com.grey.kotlinpractice.ui
 
+import android.content.ComponentName
+import android.content.Context
+import android.content.Intent
+import android.content.ServiceConnection
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.os.IBinder
 import android.text.Html
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +14,6 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.ScrollView
 import android.widget.TextView
-import androidx.constraintlayout.widget.Group
 import androidx.core.graphics.drawable.toBitmap
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -20,7 +24,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.grey.kotlinpractice.HomeViewModel
-import com.grey.kotlinpractice.PodcastPlayer
+import com.grey.kotlinpractice.PodcastPlayerService
 import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.adapter.EpisodeAdapter
 import com.grey.kotlinpractice.data.Model
@@ -63,6 +67,8 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
     //    lateinit var topBarGroup: Group
     lateinit var episodeUrl: String
 
+    lateinit var podcastPlayerService: PodcastPlayerService
+    var isBound = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -73,17 +79,35 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
         //return inflater.inflate(R.layout.fragment_episode_list, container, false)
     }
 
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
+        val fragment = this
+        val connection = object : ServiceConnection {
+            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                val binder = service as PodcastPlayerService.MyLocalBinder
+                podcastPlayerService = binder.getService()
+                isBound = true
+                adapter = EpisodeAdapter(view.context, itemList, podcastPlayerService)
+                adapter.setOnPlayButtonClickedListener(fragment)
+                adapter.setOnEpisodeClickedListener(fragment)
+                recyclerView.adapter = adapter
+            }
 
+            override fun onServiceDisconnected(name: ComponentName?) {
+                isBound = false
+            }
+        }
+        val intent = Intent(context, PodcastPlayerService::class.java)
+        requireActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE)
         val manager: RecyclerView.LayoutManager = LinearLayoutManager(view.context)
+
         itemList = ArrayList()
         recyclerView.layoutManager = manager
-        adapter = EpisodeAdapter(view.context, itemList)
-        adapter.setOnPlayButtonClickedListener(this)
-        adapter.setOnEpisodeClickedListener(this)
-        recyclerView.adapter = adapter
+
+
 
 
 
@@ -176,7 +200,8 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
 
 
         playBtn.setOnClickListener {
-            PodcastPlayer.preparePlayer(episodeUrl)
+            viewModel.currentEpisode = itemList[adapter.currentPosition]
+            podcastPlayerService.preparePlayer(episodeUrl)
             collapseBottomSheet()
         }
 
@@ -194,12 +219,14 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
             val vibrantSwatch = palette.vibrantSwatch
             accentbg.setBackgroundColor(
                 darkVibrantSwatch?.rgb ?: darkMutedSwatch?.rgb ?: mutedSwatch?.rgb
-                ?: lightMutedSwatch?.rgb ?: vibrantSwatch?.rgb?: lightVibrantSwatch?.rgb ?: palette.dominantSwatch!!.rgb
+                ?: lightMutedSwatch?.rgb ?: vibrantSwatch?.rgb ?: lightVibrantSwatch?.rgb
+                ?: palette.dominantSwatch!!.rgb
             )
 
             playBtn.setColorFilter(
                 darkVibrantSwatch?.rgb ?: darkMutedSwatch?.rgb ?: mutedSwatch?.rgb
-                ?: lightMutedSwatch?.rgb ?: vibrantSwatch?.rgb?: lightVibrantSwatch?.rgb ?: palette.dominantSwatch!!.rgb
+                ?: lightMutedSwatch?.rgb ?: vibrantSwatch?.rgb ?: lightVibrantSwatch?.rgb
+                ?: palette.dominantSwatch!!.rgb
             )
 
             //region trying out different swatches
@@ -260,7 +287,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
     }
 
     override fun sendPodcastUri(uri: String) {
-        PodcastPlayer.preparePlayer(uri)
+        podcastPlayerService.preparePlayer(uri)
     }
 
 
