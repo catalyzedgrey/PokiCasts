@@ -79,11 +79,12 @@ class EpisodeAdapter(
         holder.playBtn.setOnClickListener {
             currentPosition = position
             holder.podcastPlayerService = podcastPlayerService
+            podcastPlayerService.updateCurrentPlayingEpisode(itemList[position])
 //            sendPodcastEpisodeInfo(itemList[position].enclosure!!.url!!)
             sendPodcastEpisodeInfo(itemList[position].url!!)
-            podcastPlayerService.artistTitle = itemList[position].collectionName!!
-            podcastPlayerService.episodeTitle = holder.episodeTitle.text.toString()
-            podcastPlayerService.artworkUrl = itemList[position].imageUrl!!
+//            podcastPlayerService.artistTitle = itemList[position].collectionName!!
+//            podcastPlayerService.episodeTitle = holder.episodeTitle.text.toString()
+//            podcastPlayerService.artworkUrl = itemList[position].imageUrl!!
         }
     }
 

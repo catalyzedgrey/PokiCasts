@@ -52,18 +52,35 @@ object Model {
         ]
     )
     data class Episode(
+
         @ColumnInfo val title: String?,
-        @ColumnInfo val url: String?,
+        @PrimaryKey
+        @ColumnInfo val url: String,
         @ColumnInfo val description: String?,
         @ColumnInfo val duration: String?,
         @ColumnInfo val pubDate: String?,
         @ColumnInfo val podId: Int?,
-        val collectionName: String?,
-        val imageUrl: String?
-    ){
-        @PrimaryKey(autoGenerate = true)
-        var id: Int = 0
-    }
+        @ColumnInfo val collectionName: String?,
+        @ColumnInfo val imageUrl: String?,
+        @ColumnInfo val currentPosition: Long?,
+        @ColumnInfo var isPlaying: Boolean?,
+    )
 
+
+
+//    @Entity
+//    data class CurrentEpisode(
+//        @ColumnInfo val title: String?,
+//        @ColumnInfo val url: String?,
+//        @ColumnInfo val description: String?,
+//        @ColumnInfo val duration: String?,
+//        @ColumnInfo val pubDate: String?,
+//        val collectionName: String?,
+//        val imageUrl: String?,
+//        val currentPosition: Long?,
+//    ){
+//        @PrimaryKey(autoGenerate = true)
+//        var id: Int = 0
+//    }
 
 }

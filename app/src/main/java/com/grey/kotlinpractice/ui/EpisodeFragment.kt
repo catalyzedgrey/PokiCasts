@@ -21,6 +21,7 @@ import androidx.lifecycle.Observer
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.exoplayer2.Player
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.grey.kotlinpractice.HomeViewModel
@@ -107,10 +108,6 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
         itemList = ArrayList()
         recyclerView.layoutManager = manager
 
-
-
-
-
         bottomSheetBehavior = BottomSheetBehavior.from(bottomsheet_preview)
         val bottomSheetBehaviorCallback =
             object : BottomSheetBehavior.BottomSheetCallback() {
@@ -147,6 +144,8 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
         viewModel.isEpisodePreviewExpanded = false
     }
 
+
+
     fun expandBottomSheet() {
         val m = activity as MainActivity
         m.collapseBottomNavigationView()
@@ -158,24 +157,27 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
     }
 
 
-    fun initViews(view: View) {
+    fun initBottomSheetEpisodePrevie(view: View){
         podPreviewTitle = view.findViewById(R.id.episode_title_sheet_preview)
         podPreviewCollectionName = view.findViewById(R.id.artist_title_sheet)
         podPreviewDate = view.findViewById(R.id.sheet_date)
         podPreviewDuration = view.findViewById(R.id.duration)
         podPreviewDescription = view.findViewById(R.id.description)
-        podPreviewImage = view.findViewById(R.id.pod_icon)
-        playBtn = view.findViewById(R.id.play_btn)
-        podIcon = view.findViewById(R.id.mainpodIconControl)
-        subscribedBtn = view.findViewById(R.id.subscribed_btn)
-        recyclerView = view.findViewById(R.id.recyclerView)
-        accentbg = view.findViewById(R.id.accent_toolbar)
-
-//        topBarGroup = view.findViewById(R.id.group)
+        podPreviewImage = view.findViewById(R.id.bottomsheet_exoplayer_pod_icon)
         collapsePreview = view.findViewById(R.id.collapse_preview)
         collapsePreview.setOnClickListener {
             collapseBottomSheet()
         }
+    }
+
+    fun initViews(view: View) {
+        initBottomSheetEpisodePrevie(view)
+        playBtn = view.findViewById(R.id.play_btn)
+        podIcon = view.findViewById(R.id.exoplayer_collapsed_pod_icon)
+        subscribedBtn = view.findViewById(R.id.subscribed_btn)
+        recyclerView = view.findViewById(R.id.recyclerView)
+        accentbg = view.findViewById(R.id.accent_toolbar)
+
         appBarLayout = view.findViewById(R.id.app_bar_head)
 
         if (feedUrl != "") {
@@ -201,13 +203,12 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
 
         playBtn.setOnClickListener {
             viewModel.currentEpisode = itemList[adapter.currentPosition]
-            podcastPlayerService.preparePlayer(episodeUrl)
+            podcastPlayerService.preparePlayer(episodeUrl, viewModel.currentEpisode!!.currentPosition!!)
             collapseBottomSheet()
         }
 
     }
 
-    fun createPaletteSync(bitmap: Bitmap): Palette = Palette.from(bitmap).generate()
     fun createPaletteAsync(bitmap: Bitmap) {
         Palette.from(bitmap).generate { palette ->
 
@@ -228,32 +229,6 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
                 ?: lightMutedSwatch?.rgb ?: vibrantSwatch?.rgb ?: lightVibrantSwatch?.rgb
                 ?: palette.dominantSwatch!!.rgb
             )
-
-            //region trying out different swatches
-//            var x=4
-//            when (x){
-//                0 -> appBarLayout.background.setTint(palette!!.lightVibrantSwatch!!.rgb)
-//                1 ->appBarLayout.background.setTint(palette!!.vibrantSwatch!!.rgb)
-//                2 ->appBarLayout.background.setTint(palette!!.darkVibrantSwatch!!.rgb)
-//                3 ->appBarLayout.background.setTint(palette!!.lightMutedSwatch!!.rgb)
-//                4->appBarLayout.background.setTint(palette!!.mutedSwatch!!.rgb)
-//                5 ->appBarLayout.background.setTint(palette!!.darkMutedSwatch!!.rgb)
-//            }
-//            if (palette!!.lightVibrantSwatch != null)
-//                appBarLayout.background.setTint(palette.lightVibrantSwatch!!.rgb)
-//            else if (palette!!.vibrantSwatch != null)
-//                appBarLayout.background.setTint(palette.vibrantSwatch!!.rgb)
-//            else if (palette!!.darkVibrantSwatch != null)
-//                appBarLayout.background.setTint(palette.darkVibrantSwatch!!.rgb)
-//            else if (palette!!.lightMutedSwatch != null)
-//                appBarLayout.background.setTint(palette.lightMutedSwatch!!.rgb)
-//            else if (palette!!.mutedSwatch != null)
-//                appBarLayout.background.setTint(palette.mutedSwatch!!.rgb)
-//            else if (palette!!.darkMutedSwatch != null)
-//                appBarLayout.background.setTint(palette.darkMutedSwatch!!.rgb)
-//            else
-//                appBarLayout.background.setTint(palette.dominantSwatch!!.rgb)
-            //endregion
         }
     }
 
@@ -287,11 +262,17 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
     }
 
     override fun sendPodcastUri(uri: String) {
-        podcastPlayerService.preparePlayer(uri)
+
+        podcastPlayerService.preparePlayer(uri, viewModel.currentEpisode!!.currentPosition!!)
     }
 
 
     override fun sendPodcastEpisodeInfo(episode: Model.Episode) {
+        if(podcastPlayerService.isPlaying() && podcastPlayerService.currentUri == episode.url){
+            episode.isPlaying = true
+            viewModel.currentEpisode = episode
+            viewModel.updateEpisode()
+        }
         podPreviewTitle.text = episode.title
         podPreviewCollectionName.text = episode.collectionName
         podPreviewDate.text = episode.pubDate

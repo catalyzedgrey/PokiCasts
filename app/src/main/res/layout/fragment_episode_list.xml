@@ -27,7 +27,7 @@
                 />
 
             <ImageView
-                android:id="@+id/mainpodIconControl"
+                android:id="@+id/exoplayer_collapsed_pod_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
@@ -66,7 +66,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-        app:layout_constraintTop_toBottomOf="@id/mainpodIconControl" />
+        app:layout_constraintTop_toBottomOf="@id/exoplayer_collapsed_pod_icon" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

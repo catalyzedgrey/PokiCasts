@@ -1,17 +1,18 @@
 package com.grey.kotlinpractice
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.grey.kotlinpractice.data.*
 import com.grey.kotlinpractice.di.component.DaggerViewModelComponent
 import com.grey.kotlinpractice.di.component.ViewModelComponent
-import io.reactivex.disposables.Disposable
 import kotlinx.coroutines.*
 import tw.ktrssreader.model.channel.ITunesChannelData
 import javax.inject.Inject
 
 
-class HomeViewModel @Inject constructor() : ViewModel() {
+class HomeViewModel @Inject constructor(private val savedStateHandle: SavedStateHandle) :
+    ViewModel() {
     @Inject
     lateinit var itunesService: ItunesService
 
@@ -19,12 +20,13 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         .networkModule(com.grey.kotlinpractice.di.module.NetworkModule).build()
     private var repository: Repository
 
+
     //private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
     var isPlayerfExpanded: Boolean = false
     var isEpisodePreviewExpanded: Boolean = false
 
-    lateinit var currentEpisode: Model.Episode
+    var currentEpisode: Model.Episode? = null
 
     init {
         inject()
@@ -45,7 +47,9 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     }
 
 
-    fun getSubscribedPodcasts(): LiveData<List<Model.Podcast>>{
+    fun getSubscribedPodcasts(): LiveData<List<Model.Podcast>> {
+
+
         return repository.getSubscribedPodcastList()
     }
 
@@ -56,6 +60,11 @@ class HomeViewModel @Inject constructor() : ViewModel() {
     }
 
 
+//    fun getLastPlayedEpisode(): LiveData<Model.CurrentEpisode> {
+//        return repository.getLastPlayerPodcastInfo()
+//    }
+
+
     fun subscribeToPodcast(pod: Model.Podcast) {
         repository.insertPodcastOnSubscribe(pod)
 //        val podcastDao = Repository.DatabaseHandler.db.podcastDao()
@@ -64,16 +73,16 @@ class HomeViewModel @Inject constructor() : ViewModel() {
 //        }
     }
 
-    fun getLocalEpisodeList(url: String): LiveData<List<Model.Episode>>{
+    fun getLocalEpisodeList(url: String): LiveData<List<Model.Episode>> {
         repository.episodeLiveList.value = null
         return repository.getEpisodeListLocally(url)
     }
 
-    fun getRemoteEpisodeList(url: String): LiveData<ITunesChannelData>{
+    fun getRemoteEpisodeList(url: String): LiveData<ITunesChannelData> {
         return repository.getEpisodeListRemotely(url)
     }
 
-    fun unsubscribe(feedUrl: String){
+    fun unsubscribe(feedUrl: String) {
         repository.unsubscribeAndDeletePodcast(feedUrl)
     }
 
@@ -82,6 +91,23 @@ class HomeViewModel @Inject constructor() : ViewModel() {
         // do your network request logic here and return the result
         repository.podcastDao.findByName(url)
     }
+
+    fun getEpisodeByFeed(feedUrl: String): LiveData<Model.Episode> {
+        return repository.getEpisodeByFeedUrl(feedUrl)
+    }
+
+    fun saveLastPlayedPodcastInfo(episode: Model.Episode) {
+        repository.saveLastPlayedPodcastInfo(episode)
+    }
+
+    fun updateEpisode() {
+        if (currentEpisode != null)
+            repository.updateEpisode(currentEpisode!!)
+    }
+
+//    fun saveLastPlayedPodcastInfo(episode: Model.CurrentEpisode) {
+//        repository.saveLastPlayedPodcastInfo(episode)
+//    }
 
 
 }

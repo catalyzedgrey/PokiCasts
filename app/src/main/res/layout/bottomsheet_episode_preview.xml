@@ -22,17 +22,18 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="15dp"
             android:src="@drawable/ic_baseline_expand_more_24"
-            app:layout_constraintTop_toTopOf="@id/pod_icon"
-            app:layout_constraintEnd_toStartOf="@id/pod_icon"/>
+            app:layout_constraintTop_toTopOf="@id/bottomsheet_exoplayer_pod_icon"
+            app:layout_constraintEnd_toStartOf="@id/bottomsheet_exoplayer_pod_icon"/>
 
         <ImageView
-            android:id="@+id/pod_icon"
+            android:id="@+id/bottomsheet_exoplayer_pod_icon"
             android:layout_width="280dp"
             android:layout_height="280dp"
             android:layout_marginTop="50dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            android:src="@drawable/exo_ic_default_album_image"/>
 
 
         <TextView
@@ -45,7 +46,7 @@
             android:textAlignment="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/pod_icon" />
+            app:layout_constraintTop_toBottomOf="@id/bottomsheet_exoplayer_pod_icon" />
 
         <TextView
             android:id="@+id/artist_title_sheet"
@@ -111,12 +112,13 @@
             android:layout_marginStart="10dp"
             android:layout_marginTop="15dp"
             android:layout_marginEnd="10dp"
-            android:textColor="@color/colorLightAccent"
+            android:autoLink="web"
 
+            android:textColor="@color/colorLightAccent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/duration"
-            android:autoLink="web"
+
             />
 
     </androidx.constraintlayout.widget.ConstraintLayout>

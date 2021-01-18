@@ -3,10 +3,7 @@ package com.grey.kotlinpractice.ui
 //import com.grey.kotlinpractice.adapter.PodcastHomeAdapter
 //import com.grey.kotlinpractice.di.component.ContextComponent
 //import com.grey.kotlinpractice.di.component.DaggerContextComponent
-import android.content.ComponentName
-import android.content.Context
-import android.content.Intent
-import android.content.ServiceConnection
+import android.content.*
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
@@ -16,6 +13,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import com.google.android.exoplayer2.Player
 import com.google.android.exoplayer2.ui.DefaultTimeBar
 import com.google.android.exoplayer2.ui.StyledPlayerControlView
@@ -26,9 +24,9 @@ import com.grey.kotlinpractice.HomeViewModel
 import com.grey.kotlinpractice.PodcastPlayerService
 import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.data.AppDatabase
+import com.grey.kotlinpractice.data.Model
 import com.grey.kotlinpractice.databinding.ActivityMainBinding
-import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.activity_main.view.*
+import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.bottomsheet_player.*
 
 
@@ -45,18 +43,57 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
-    lateinit var imgViewSheet: ImageView
+    lateinit var exoplayerCollapsedPodIcon: ImageView
     lateinit var defaultTimeBar: DefaultTimeBar
     lateinit var playerView: StyledPlayerControlView
     lateinit var bottomPlayerView: StyledPlayerControlView
 
     lateinit var podcastPlayerService: PodcastPlayerService
     var isBound = false
-    lateinit var bottomPodcastName: TextView
-    lateinit var bottomArtistName: TextView
+
+    lateinit var bottomSheetPodcastName: TextView
+    lateinit var bottomSheetPlayerArtistName: TextView
+    lateinit var bottomSheetPlayerPodIcon: ImageView
+
     lateinit var connection: ServiceConnection
 
+    lateinit var sharedpreferences: SharedPreferences
+
     private val viewModel: HomeViewModel by viewModels()
+
+
+
+    fun updatePlayerUI() {
+//        val resultObserver = Observer<Model.CurrentEpisode> { result ->
+//            // Update the UI
+//            if (result != null) {
+//                bottomSheetPodcastName.text = result.title
+//                bottomSheetPlayerArtistName.text = result.collectionName
+//                Picasso.get().load(result.imageUrl).into(exoplayerCollapsedPodIcon)
+//                Picasso.get().load(result.imageUrl).into(bottomSheetPlayerPodIcon)
+//                viewModel.currentEpisode = convertCurrentEpisodeToEpisode(result)
+//            }
+//        }
+//        viewModel.getLastPlayerEpisode().observe(this, resultObserver)
+
+
+        val urlKey = sharedpreferences.getString("urlKey", "")
+
+        val resultObserver = Observer<Model.Episode> { result ->
+            // Update the UI
+            if (result != null) {
+                bottomSheetPodcastName.text = result.title
+                bottomSheetPlayerArtistName.text = result.collectionName
+                Picasso.get().load(result.imageUrl).into(exoplayerCollapsedPodIcon)
+                Picasso.get().load(result.imageUrl).into(bottomSheetPlayerPodIcon)
+                viewModel.currentEpisode = result
+
+            }
+        }
+
+        viewModel.getEpisodeByFeed(urlKey!!).observe(this, resultObserver)
+    }
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,21 +109,29 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
                 .commit()
         }
 
+        sharedpreferences = getSharedPreferences("prefs", MODE_PRIVATE)
         val activity = this
-        connection = object : ServiceConnection {
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                val binder = service as PodcastPlayerService.MyLocalBinder
-                podcastPlayerService = binder.getService()
-                playerView.player = podcastPlayerService.exoPlayer
-                bottomPlayerView.player = podcastPlayerService.exoPlayer
-                isBound = true
-                podcastPlayerService.addListener(activity)
-            }
+        connection =
+            object : ServiceConnection {
+                override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                    val binder = service as PodcastPlayerService.MyLocalBinder
+                    podcastPlayerService = binder.getService()
+                    playerView.player = podcastPlayerService.exoPlayer
+                    bottomPlayerView.player = podcastPlayerService.exoPlayer
+                    isBound = true
+                    podcastPlayerService.addListener(activity)
+                    podcastPlayerService.viewModel = viewModel
+                    if(viewModel.currentEpisode != null)
+                    {
+                        podcastPlayerService.preparePlayer(viewModel.currentEpisode!!.url, viewModel.currentEpisode!!.currentPosition!!)
+                        podcastPlayerService.pause()
+                    }
+                }
 
-            override fun onServiceDisconnected(name: ComponentName?) {
-                isBound = false
+                override fun onServiceDisconnected(name: ComponentName?) {
+                    isBound = false
+                }
             }
-        }
 
         val intent = Intent(this, PodcastPlayerService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
@@ -95,6 +140,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         handleBottomNavSwitching()
 
     }
+
 
 
     private fun handleBottomNavSwitching() {
@@ -154,8 +200,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
             .replace(R.id.container, episodeFragment, episodeFragment.javaClass.getSimpleName())
             .addToBackStack("tag")
             .commit()
-        podcastPlayerService.artworkUrl = artworkUrl
-        podcastPlayerService.loadBitmap()
+        //podcastPlayerService.artworkUrl = artworkUrl
+        //podcastPlayerService.loadBitmap()
         episodeFragment.updatePodcastIndex(podcastPosIndex, artworkUrl, collectionName)
     }
 
@@ -179,15 +225,21 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
     private fun initUi() {
+
         AppDatabase.DatabaseProvider.context = applicationContext
         bottomNavigationView = binding.root.findViewById(R.id.bottomNavigationView)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
-        imgViewSheet = binding.root.findViewById<ImageView>(R.id.mainpodIconControl)
+        exoplayerCollapsedPodIcon =
+            binding.root.findViewById<ImageView>(R.id.exoplayer_collapsed_pod_icon)
         playerView = binding.root.findViewById<StyledPlayerControlView>(R.id.exoplayer)
         bottomPlayerView = binding.root.findViewById<StyledPlayerControlView>(R.id.player_control)
 
-        bottomPodcastName = binding.root.findViewById(R.id.episode_title_sheet_preview)
-        bottomArtistName = binding.root.findViewById(R.id.artist_title_sheet)
+        bottomSheetPodcastName = binding.root.findViewById(R.id.episode_title_sheet_preview)
+        bottomSheetPlayerArtistName = binding.root.findViewById(R.id.artist_title_sheet)
+        bottomSheetPlayerPodIcon = binding.root.findViewById(R.id.bottomsheet_exoplayer_pod_icon)
+
+
+
         defaultTimeBar = binding.root.findViewById<DefaultTimeBar>(R.id.exo_progress)
         defaultTimeBar.addListener(this)
 
@@ -207,7 +259,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
             }
 
         bottomSheetBehavior.addBottomSheetCallback(bottomSheetBehaviorCallback)
-        imgViewSheet.setOnClickListener {
+        exoplayerCollapsedPodIcon.setOnClickListener {
             if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED) {
                 collapseBottomSheet()
             } else {
@@ -216,6 +268,17 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
             }
         }
+        val i = intent
+        val shouldExpandSheet = i.getBooleanExtra("shouldExpandSheet", false)
+        val episodeTitle = i.getStringExtra("episodeTitle")
+        val artistTitle = i.getStringExtra("artistTitle")
+
+        updatePlayerUI()
+        if (shouldExpandSheet) {
+            expandBottomSheet()
+            collapseBottomNavigationView()
+        }
+
     }
 
 
@@ -232,24 +295,38 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     override fun onIsPlayingChanged(isPlaying: Boolean) {
         super.onIsPlayingChanged(isPlaying)
         if (isPlaying) {
-            val epTitle = podcastPlayerService.episodeTitle //.getEpisodeTitle()
-            val artistName = podcastPlayerService.artistTitle //getArtistTitle()
-            bottomPodcastName.text = epTitle
-            bottomArtistName.text = artistName
+            //val epTitle = podcastPlayerService.episodeTitle //.getEpisodeTitle()
+            //val artistName = podcastPlayerService.artistTitle //getArtistTitle()
+            bottomSheetPodcastName.text = viewModel.currentEpisode?.title
+            bottomSheetPlayerArtistName.text = viewModel.currentEpisode?.collectionName
+            Picasso.get().load(viewModel.currentEpisode?.imageUrl).into(exoplayerCollapsedPodIcon)
+            Picasso.get().load(viewModel.currentEpisode?.imageUrl).into(bottomSheetPlayerPodIcon)
+
         }
     }
 
     override fun onStop() {
         super.onStop()
+        if (viewModel.currentEpisode != null) {
+            //val currentEpisode: Model.CurrentEpisode = Util.convertEpisodeToCurrentEpisode(viewModel.currentEpisode!!, podcastPlayerService.exoPlayer!!.currentPosition)
+            //viewModel.saveLastPlayedPodcastInfo(currentEpisode)
+
+            viewModel.saveLastPlayedPodcastInfo(viewModel.currentEpisode!!)
+            val editor: SharedPreferences.Editor = sharedpreferences.edit()
+            editor.putString("urlKey", viewModel.currentEpisode!!.url!!)
+            editor.commit()
+
+
+        }
 
         //PodcastPlayerService.release()
         //PodcastPlayerService.onDestroy()
 
     }
 
+
     override fun onDestroy() {
         podcastPlayerService.release()
-        podcastPlayerService.stopSelf()
         podcastPlayerService.onDestroy()
         super.onDestroy()
     }
@@ -272,7 +349,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         timeBar.setEnabled(false)
         return
     }
-    //endregion
+//endregion
 }
 
 

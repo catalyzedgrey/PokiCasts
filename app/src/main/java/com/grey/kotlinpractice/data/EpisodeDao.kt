@@ -1,7 +1,6 @@
 package com.grey.kotlinpractice.data
 
 import androidx.room.*
-import tw.ktrssreader.model.item.ITunesItem
 import tw.ktrssreader.model.item.ITunesItemData
 
 @Dao
@@ -9,8 +8,14 @@ interface EpisodeDao {
     @Query("SELECT * FROM episode")
     fun getAll(): List<Model.Episode>
 
+    @Query("SELECT * FROM episode WHERE url Like :url")
+    fun getAllByUrl(url: String): List<Model.Episode>
+
 //    @Query("SELECT * FROM episode WHERE uid IN (:userIds)")
 //    fun loadAllByIds(userIds: IntArray): List<Model.Podcast>
+
+    @Query("SELECT * FROM episode WHERE url LIKE :url")
+    fun getEpisodeByUrl(url: String): Model.Episode
 
 //    @Insert(onConflict = OnConflictStrategy.REPLACE)
 //    fun insertAll(vararg episode: List<ITunesItemData>)
@@ -27,20 +32,26 @@ interface EpisodeDao {
     @Query("DELETE FROM episode")
     fun deleteAll()
 
+    @Query("SELECT * FROM episode WHERE isPlaying LIKE 1")
+    fun getCurrentPlayingEpisode(): Model.Episode
+
     fun transformItunesDatatoEpisode(itunesItemData:  List<ITunesItemData>, podId: Int, podName: String, artworkUrl: String): List<Model.Episode>{
         val episodes: ArrayList<Model.Episode> = ArrayList()
         for(item in itunesItemData){
             val e = Model.Episode(
-                item.title,
-                item.enclosure!!.url,
-                item.description,
-                item.duration,
-                item.pubDate,
-                podId,
-                podName,
-                artworkUrl
+                title = item.title,
+                url = item.enclosure!!.url!!,
+                description = item.description,
+                duration = item.duration,
+                pubDate = item.pubDate,
+                podId = podId,
+                collectionName = podName,
+                imageUrl = artworkUrl,
+                currentPosition = 0,
+                false
             )
             episodes.add(e)
+
         }
 
 

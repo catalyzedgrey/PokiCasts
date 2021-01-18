@@ -7,7 +7,7 @@
     android:background="@color/colorPrimary">
 
     <ImageView
-        android:id="@+id/pod_icon"
+        android:id="@+id/bottomsheet_exoplayer_pod_icon"
         android:layout_width="280dp"
         android:layout_height="280dp"
 
@@ -22,7 +22,7 @@
 
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/pod_icon"
+        app:layout_constraintTop_toBottomOf="@id/bottomsheet_exoplayer_pod_icon"
         android:textColor="@color/colorLightAccent"/>
 
     <TextView

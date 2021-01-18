@@ -1,13 +1,12 @@
 package com.grey.kotlinpractice.data
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.schedulers.Schedulers
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import tw.ktrssreader.Reader
 import tw.ktrssreader.model.channel.*
 import javax.inject.Inject
@@ -18,6 +17,7 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
     private lateinit var subscription: Disposable
     val podcastDao = DatabaseHandler.db.podcastDao()
     val episodeDao = DatabaseHandler.db.episodeDao()
+//    val currentEpisodeDao = DatabaseHandler.db.currentEpisodeDao()
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -36,6 +36,10 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
 
     val episodeLiveList: MutableLiveData<List<Model.Episode>> by lazy {
         MutableLiveData<List<Model.Episode>>()
+    }
+
+    val currentEpisodeLiveDate: MutableLiveData<Model.Episode> by lazy {
+        MutableLiveData<Model.Episode>()
     }
 
 
@@ -75,22 +79,36 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
     fun getEpisodeListLocally(feedUrl: String): MutableLiveData<List<Model.Episode>> {
         if (feedUrl != "") {
             coroutineScope.launch {
+
+                var episodes: List<Model.Episode> = episodeDao.getAllByUrl(feedUrl)
                 val pod = podcastDao.findByFeedUrl(feedUrl)
                 val m: ITunesChannelData = Reader.read<ITunesChannelData>(pod.feedUrl)
-                pod.artworkUrl600
-                val episodes: List<Model.Episode> =
-                    episodeDao.transformItunesDatatoEpisode(
-                        m.items!!,
-                        pod.uid,
-                        pod.collectionName!!,
-                        pod.artworkUrl600!!
-                    )
-                episodeDao.insertAll(episodes)
+
+                if(episodes.isEmpty() || m.items?.size!! > episodes.size){
+
+                    episodes =
+                        episodeDao.transformItunesDatatoEpisode(
+                            m.items!!,
+                            pod.uid,
+                            pod.collectionName!!,
+                            pod.artworkUrl600!!
+                        )
+                    episodeDao.insertAll(episodes)
+
+                }
                 episodeLiveList.postValue(episodes)
             }
         }
         return episodeLiveList
     }
+
+    fun getEpisodeListLocallyNoRefresh(podId: Int): MutableLiveData<List<Model.Episode>> {
+        coroutineScope.launch {
+            episodeLiveList.postValue(episodeDao.getAll())
+        }
+        return episodeLiveList
+    }
+
 
     fun getEpisodeListRemotely(feedUrl: String): MutableLiveData<ITunesChannelData> {
         if (feedUrl != "") {
@@ -135,6 +153,42 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
         }
     }
 
+    fun updateEpisode(episode: Model.Episode) {
+        coroutineScope.launch {
+            episodeDao.updateEpisodeData(episode)
+        }
+    }
+
+    fun getEpisodeByFeedUrl(feedUrl: String): LiveData<Model.Episode> {
+        if (feedUrl != "") {
+            coroutineScope.launch {
+                currentEpisodeLiveDate.postValue(episodeDao.getEpisodeByUrl(feedUrl))
+            }
+        }
+
+        return currentEpisodeLiveDate
+    }
+
+    fun saveLastPlayedPodcastInfo(episode: Model.Episode) {
+        coroutineScope.launch {
+            episodeDao.updateEpisodeData(episode)
+        }
+    }
+
+
+//    fun saveLastPlayerPdocastInfo(episode: Model.CurrentEpisode) {
+//        coroutineScope.launch {
+//            currentEpisodeDao.insert(episode)
+//        }
+//    }
+//
+//
+//    fun getLastPlayerPodcastInfo(): LiveData<Model.CurrentEpisode> {
+//        coroutineScope.launch {
+//            currentEpisodeLiveDate.postValue(currentEpisodeDao.getEpisode())
+//        }
+//        return currentEpisodeLiveDate
+//    }
 
     fun dispose() {
 

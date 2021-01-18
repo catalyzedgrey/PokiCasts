@@ -6,17 +6,22 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.toDrawable
 import androidx.palette.graphics.Palette
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
 import com.google.android.exoplayer2.ui.PlayerNotificationManager.*
 import com.grey.kotlinpractice.data.AppDatabase
 import com.grey.kotlinpractice.data.AppDatabase.DatabaseProvider.context
+import com.grey.kotlinpractice.data.Model
+import com.grey.kotlinpractice.ui.MainActivity
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -27,14 +32,18 @@ class PodcastPlayerService : Service(), Player.EventListener {
     var exoPlayer: SimpleExoPlayer?
     lateinit var mediaItem: MediaItem
     var currentUri: String = ""
-    var episodeTitle: String = ""
-    var artistTitle: String = ""
-    var artworkUrl: String = ""
+    //var episodeTitle: String = ""
+    //var artistTitle: String = ""
+    //var artworkUrl: String = ""
+    var artwork: Bitmap? = null
+
     val coroutineScope = CoroutineScope(Dispatchers.IO)
-    lateinit var artwork: Bitmap
     lateinit var paletteSwatch: Palette.Swatch
     private val myBinder = MyLocalBinder()
     var playerNotificationManager: PlayerNotificationManager? = null
+
+    lateinit var viewModel: HomeViewModel
+
 
     //private val mediaDescriptionAdapter: MediaDescriptionAdapter =
     lateinit var notification: Notification
@@ -43,6 +52,8 @@ class PodcastPlayerService : Service(), Player.EventListener {
 
         exoPlayer = SimpleExoPlayer.Builder(context).build()
         exoPlayer!!.addListener(this)
+
+
         configureNotification()
     }
 
@@ -59,20 +70,34 @@ class PodcastPlayerService : Service(), Player.EventListener {
                 }
 
                 override fun getCurrentContentTitle(player: Player): String {
-                    return artistTitle
+                    return viewModel.currentEpisode?.collectionName?: ""
                 }
 
                 override fun createCurrentContentIntent(player: Player): PendingIntent? {
-                    return null
+
+                    val intent = Intent(this@PodcastPlayerService, MainActivity::class.java)
+                    intent.putExtra("shouldExpandSheet", true)
+                    intent.putExtra("episodeTitle", viewModel.currentEpisode?.title?: "")
+                    intent.putExtra("artistTitle", viewModel.currentEpisode?.collectionName?: "")
+
+                    // both of these approaches now work: FLAG_CANCEL, FLAG_UPDATE; the uniqueInt may be the real solution.
+                    //PendingIntent pendingIntent = PendingIntent.getActivity(this, uniqueInt, showFullQuoteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
+
+                    return PendingIntent.getActivity(this@PodcastPlayerService, 50, intent, PendingIntent.FLAG_UPDATE_CURRENT)
                 }
 
                 override fun getCurrentContentText(player: Player): String {
-                    return episodeTitle
+                    return viewModel.currentEpisode?.title?: ""
                 }
 
                 override fun getCurrentLargeIcon(player: Player, callback: BitmapCallback): Bitmap {
-                    return artwork
+                    if(artwork == null){
+                        loadBitmap()
+                    }
+                    return artwork!!
                 }
+
+
             },
             object : NotificationListener {
                 override fun onNotificationPosted(
@@ -82,7 +107,11 @@ class PodcastPlayerService : Service(), Player.EventListener {
                 ) {
                     super.onNotificationPosted(notificationId, notification, ongoing)
 
-                    if(ongoing)
+                    if(viewModel.currentEpisode != null && exoPlayer?.playbackState == Player.STATE_ENDED){
+                        preparePlayer(viewModel.currentEpisode!!.url!!, viewModel.currentEpisode!!.currentPosition!!)
+                    }
+
+                    if (ongoing)
                         startForeground(notificationId, notification);
                     else
                         stopForeground(false)
@@ -93,7 +122,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
                     dismissedByUser: Boolean
                 ) {
                     super.onNotificationCancelled(notificationId, dismissedByUser)
-                    if(dismissedByUser)
+                    if (dismissedByUser)
                         stopSelf()
                 }
             }
@@ -108,8 +137,15 @@ class PodcastPlayerService : Service(), Player.EventListener {
         playerNotificationManager!!.setRewindIncrementMs(5000)
         playerNotificationManager!!.setFastForwardIncrementMs(5000)
         playerNotificationManager!!.setPlayer(exoPlayer)
+
+
     }
 
+
+    fun updateCurrentPlayingEpisode(episode: Model.Episode) {
+        viewModel.currentEpisode = episode
+        loadBitmap()
+    }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         initPlayer(context)
@@ -122,7 +158,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
     }
 
 
-    fun preparePlayer(uri: String) {
+    fun preparePlayer(uri: String, position: Long) {
 
         if (exoPlayer == null) {
             initPlayer(context)
@@ -141,6 +177,8 @@ class PodcastPlayerService : Service(), Player.EventListener {
             // Prepare the player.
             exoPlayer!!.prepare()
             // Start the playback.
+
+            exoPlayer!!.seekTo(position)
             play()
         } else if (currentUri == uri && isPlaying())
             pause()
@@ -219,7 +257,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
 //    }
 
     fun release() {
-        exoPlayer!!.release()
+        exoPlayer?.release()
     }
 
 
@@ -241,7 +279,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
 
 
     fun loadBitmap() {
-        Picasso.get().load(artworkUrl).into(object : com.squareup.picasso.Target {
+        Picasso.get().load(viewModel?.currentEpisode?.imageUrl).into(object : com.squareup.picasso.Target {
             override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
@@ -252,7 +290,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
 
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
                 artwork = bitmap!!
-                paletteSwatch = createPaletteSync(artwork).dominantSwatch!!
+                paletteSwatch = createPaletteSync(artwork!!).dominantSwatch!!
                 playerNotificationManager!!.setColor(paletteSwatch.rgb)
             }
         })
