@@ -8,6 +8,7 @@ import android.graphics.Bitmap
 import android.os.Bundle
 import android.os.IBinder
 import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -284,10 +285,13 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
             podPreviewDescription.text = Html.fromHtml(
-                episode.description, Html.FROM_HTML_MODE_COMPACT
+                episode.description, Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM
             )
         } else
             podPreviewDescription.text = Html.fromHtml(episode.description)
+
+        podPreviewDescription.movementMethod = LinkMovementMethod.getInstance();
+
 
 
 

@@ -62,6 +62,7 @@
         android:layout_marginEnd="20dp"
         android:layout_marginBottom="5dp"
         android:background="@drawable/selectorsquaredborder"
+
         app:layout_constraintBottom_toTopOf="@id/bottomview"
 
 

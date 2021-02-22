@@ -4,10 +4,14 @@ package com.grey.kotlinpractice.ui
 import android.annotation.SuppressLint
 import android.app.Dialog
 import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.view.View
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.grey.kotlinpractice.R
+import java.text.SimpleDateFormat
+import java.time.format.DateTimeFormatter
+import java.util.*
 
 
 class BottomSheetEpisodeDescriptionFragment : BottomSheetDialogFragment() {
@@ -38,10 +42,20 @@ class BottomSheetEpisodeDescriptionFragment : BottomSheetDialogFragment() {
         descriptiontv = contentView.findViewById(R.id.bottom_sheet_ep_description_text)
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-            descriptiontv.text = Html.fromHtml(description, Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH
-            )
+//            descriptiontv.text = Html.fromHtml(description, Html.FROM_HTML_SEPARATOR_LINE_BREAK_PARAGRAPH)
+//            descriptiontv.text = Html.fromHtml(description, Html.FROM_HTML_SEPARATOR_LINE_BREAK_BLOCKQUOTE)
+//            descriptiontv.text = Html.fromHtml(description, Html.FROM_HTML_MODE_COMPACT)
+//            descriptiontv.text = Html.fromHtml(description, Html.FROM_HTML_MODE_LEGACY)
+//            descriptiontv.text = Html.fromHtml(description, Html.FROM_HTML_SEPARATOR_LINE_BREAK_DIV)
+            descriptiontv.text = Html.fromHtml(description, Html.FROM_HTML_SEPARATOR_LINE_BREAK_LIST_ITEM)
+//            descriptiontv.text = Html.fromHtml(description, Html.FROM_HTML_OPTION_USE_CSS_COLORS)
+//            descriptiontv.text = Html.fromHtml(description, Html.FROM_HTML_SEPARATOR_LINE_BREAK_HEADING)
+
+
         } else
             descriptiontv.text = Html.fromHtml(description)
+
+        descriptiontv.setMovementMethod(LinkMovementMethod.getInstance());
 
 
 
@@ -51,7 +65,11 @@ class BottomSheetEpisodeDescriptionFragment : BottomSheetDialogFragment() {
 
     fun updateUI(title: String, releaseDate: String, duration: String, description: String) {
         this.eptitle = title
-        this.releaseDate = releaseDate
+        var stringList = releaseDate.split(" ")
+        this.releaseDate = stringList[0]+ " " +stringList[1] + " "+ stringList[2] +" "+ stringList [3]
+
+
+
         this.duration = duration
         this.description = description
     }
