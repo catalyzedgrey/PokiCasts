@@ -6,14 +6,11 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
-import android.util.Log
 import androidx.core.app.NotificationCompat
-import androidx.core.graphics.drawable.toDrawable
 import androidx.palette.graphics.Palette
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.ui.PlayerNotificationManager
@@ -70,28 +67,33 @@ class PodcastPlayerService : Service(), Player.EventListener {
                 }
 
                 override fun getCurrentContentTitle(player: Player): String {
-                    return viewModel.currentEpisode?.collectionName?: ""
+                    return viewModel.currentEpisode?.collectionName ?: ""
                 }
 
                 override fun createCurrentContentIntent(player: Player): PendingIntent? {
 
                     val intent = Intent(this@PodcastPlayerService, MainActivity::class.java)
                     intent.putExtra("shouldExpandSheet", true)
-                    intent.putExtra("episodeTitle", viewModel.currentEpisode?.title?: "")
-                    intent.putExtra("artistTitle", viewModel.currentEpisode?.collectionName?: "")
+                    intent.putExtra("episodeTitle", viewModel.currentEpisode?.title ?: "")
+                    intent.putExtra("artistTitle", viewModel.currentEpisode?.collectionName ?: "")
 
                     // both of these approaches now work: FLAG_CANCEL, FLAG_UPDATE; the uniqueInt may be the real solution.
                     //PendingIntent pendingIntent = PendingIntent.getActivity(this, uniqueInt, showFullQuoteIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 
-                    return PendingIntent.getActivity(this@PodcastPlayerService, 50, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+                    return PendingIntent.getActivity(
+                        this@PodcastPlayerService,
+                        50,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT
+                    )
                 }
 
                 override fun getCurrentContentText(player: Player): String {
-                    return viewModel.currentEpisode?.title?: ""
+                    return viewModel.currentEpisode?.title ?: ""
                 }
 
                 override fun getCurrentLargeIcon(player: Player, callback: BitmapCallback): Bitmap {
-                    if(artwork == null){
+                    if (artwork == null) {
                         loadBitmap()
                     }
                     return artwork!!
@@ -107,8 +109,11 @@ class PodcastPlayerService : Service(), Player.EventListener {
                 ) {
                     super.onNotificationPosted(notificationId, notification, ongoing)
 
-                    if(viewModel.currentEpisode != null && exoPlayer?.playbackState == Player.STATE_ENDED){
-                        preparePlayer(viewModel.currentEpisode!!.url!!, viewModel.currentEpisode!!.currentPosition!!)
+                    if (viewModel.currentEpisode != null && exoPlayer?.playbackState == Player.STATE_ENDED) {
+                        preparePlayer(
+                            viewModel.currentEpisode!!.url!!,
+                            viewModel.currentEpisode!!.currentPosition!!
+                        )
                     }
 
                     if (ongoing)
@@ -210,6 +215,12 @@ class PodcastPlayerService : Service(), Player.EventListener {
         return exoPlayer!!.isPlaying
     }
 
+    fun changePlaybackSpeed(speed: Float){
+        val param = PlaybackParameters(speed)
+        exoPlayer?.setPlaybackParameters(param)
+
+    }
+
 
     override fun onPlayWhenReadyChanged(playWhenReady: Boolean, reason: Int) {
 //        if (!playWhenReady) {
@@ -279,7 +290,8 @@ class PodcastPlayerService : Service(), Player.EventListener {
 
 
     fun loadBitmap() {
-        Picasso.get().load(viewModel?.currentEpisode?.imageUrl).into(object : com.squareup.picasso.Target {
+        Picasso.get().load(viewModel?.currentEpisode?.imageUrl).into(object :
+            com.squareup.picasso.Target {
             override fun onBitmapFailed(e: java.lang.Exception?, errorDrawable: Drawable?) {
                 TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }

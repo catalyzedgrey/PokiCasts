@@ -97,6 +97,7 @@ class HomeViewModel @Inject constructor(private val savedStateHandle: SavedState
     }
 
     fun saveLastPlayedPodcastInfo(episode: Model.Episode) {
+
         repository.saveLastPlayedPodcastInfo(episode)
     }
 

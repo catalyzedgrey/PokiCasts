@@ -62,7 +62,7 @@ object Model {
         @ColumnInfo val podId: Int?,
         @ColumnInfo val collectionName: String?,
         @ColumnInfo val imageUrl: String?,
-        @ColumnInfo val currentPosition: Long?,
+        @ColumnInfo var currentPosition: Long?,
         @ColumnInfo var isPlaying: Boolean?,
     )
 
