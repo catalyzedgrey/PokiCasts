@@ -73,9 +73,9 @@ class HomeViewModel @Inject constructor(private val savedStateHandle: SavedState
 //        }
     }
 
-    fun getLocalEpisodeList(url: String): LiveData<List<Model.Episode>> {
+    fun getLocalEpisodeList(podId: Int): LiveData<List<Model.Episode>> {
         repository.episodeLiveList.value = null
-        return repository.getEpisodeListLocally(url)
+        return repository.getEpisodeListLocally(podId)
     }
 
     fun getRemoteEpisodeList(url: String): LiveData<ITunesChannelData> {

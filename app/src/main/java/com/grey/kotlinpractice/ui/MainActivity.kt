@@ -29,6 +29,7 @@ import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.data.AppDatabase
 import com.grey.kotlinpractice.data.Model
 import com.grey.kotlinpractice.databinding.ActivityMainBinding
+import com.grey.kotlinpractice.utils.Util
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.bottomsheet_episode_description.*
 import kotlinx.android.synthetic.main.bottomsheet_player.*
@@ -70,6 +71,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     lateinit var plusSpeed: ImageView
     lateinit var bottomControlDescription: ImageView
     lateinit var bottomSheetDialogFragment: BottomSheetEpisodeDescriptionFragment
+    lateinit var bottomMarkPlayed: ImageView
 
 
     private val viewModel: HomeViewModel by viewModels()
@@ -110,6 +112,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        Util.context = applicationContext
         binding = ActivityMainBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
@@ -204,6 +207,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
     override fun sendPodcastIndex(
+        podId: Int,
         podcastPosIndex: String,
         artworkUrl: String,
         collectionName: String
@@ -214,7 +218,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
             .commit()
         //podcastPlayerService.artworkUrl = artworkUrl
         //podcastPlayerService.loadBitmap()
-        episodeFragment.updatePodcastIndex(podcastPosIndex, artworkUrl, collectionName)
+        episodeFragment.updatePodcastIndex(podId, podcastPosIndex, artworkUrl, collectionName)
     }
 
 
@@ -237,7 +241,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
 
-    private fun updateUI(){
+    private fun updateUI() {
         //the expanded player part
         bottomSheetPodcastName.text = viewModel.currentEpisode?.title
         bottomSheetPlayerArtistName.text = viewModel.currentEpisode?.collectionName
@@ -249,7 +253,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     }
 
-    private fun initBottomSheetDescriptionPage(){
+    private fun initBottomSheetDescriptionPage() {
         bottom_sheet_ep_description_title
         bottom_sheet_ep_description_release
         bottom_sheet_ep_description_duration
@@ -257,6 +261,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
 
     }
+
     private fun initUi() {
 
         AppDatabase.DatabaseProvider.context = applicationContext
@@ -276,6 +281,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         bottomSheetPlayerPodIcon = binding.root.findViewById(R.id.bottomsheet_exoplayer_pod_icon)
 
         speedControlButton = binding.root.findViewById(R.id.speed_control)
+        bottomMarkPlayed = binding.root.findViewById(R.id.bottom_mark_played)
+
         speedGroup = binding.root.findViewById(R.id.speed_group)
         plusSpeed = binding.root.findViewById(R.id.plus_speed)
         minusSpeed = binding.root.findViewById(R.id.minus_speed)
@@ -283,20 +290,11 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
         bottomControlDescription = binding.root.findViewById(R.id.bottom_description)
 
-        bottomControlDescription.setOnClickListener{
-            bottomSheetDialogFragment = BottomSheetEpisodeDescriptionFragment()
-            bottomSheetDialogFragment.show(supportFragmentManager, bottomSheetDialogFragment.tag)
-            updateEpisodeDescriptionBottomSheet()
-//            bottomSheetEpisodeDescriptionBehavior.state = BottomSheetBehavior.STATE_EXPANDED
-        }
 
 
-        speedControlButton.setOnClickListener {
-            if (speedGroup.visibility == View.VISIBLE) {
-                speedGroup.visibility = View.GONE
-            } else
-                speedGroup.visibility = View.VISIBLE
-        }
+        handleBottomplayerControls()
+
+
 
 
 
@@ -341,10 +339,54 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     }
 
+    private fun handleBottomplayerControls() {
+        speedControlButton.setOnClickListener {
+            if (speedGroup.visibility == View.VISIBLE) {
+                speedGroup.visibility = View.GONE
+            } else
+                speedGroup.visibility = View.VISIBLE
+        }
+
+        bottomControlDescription.setOnClickListener {
+            bottomSheetDialogFragment = BottomSheetEpisodeDescriptionFragment()
+            bottomSheetDialogFragment.show(supportFragmentManager, bottomSheetDialogFragment.tag)
+            updateEpisodeDescriptionBottomSheet()
+//            bottomSheetEpisodeDescriptionBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+        }
+
+        bottomMarkPlayed.setOnClickListener {
+            clearEpisodeWhenMarkedPlay()
+        }
+
+    }
+
+    private fun clearEpisodeWhenMarkedPlay(){
+        viewModel.currentEpisode = null
+        viewModel.currentEpisode?.isMarkedPlayed = true
+        viewModel.updateEpisode()
+        episodeFragment.updateRecyclerView()
+//        playerView.player?.stop()
+        playerView.player?.clearMediaItems()
+        playerView.player?.release()
+        playerView.invalidate()
+        playerView.findViewById<ImageView>(R.id.exo_play_pause).setImageResource(R.drawable.exo_ic_play_circle_filled)
+        podcastPlayerService.stop()
+        podcastPlayerService.clearMediaItem()
+
+        collapseBottomSheet()
+        exoplayerCollapsedPodIcon.setImageResource(R.drawable.exo_ic_default_album_image)
+
+
+
+
+    }
     private fun updateEpisodeDescriptionBottomSheet() {
-
-
-        bottomSheetDialogFragment.updateUI(viewModel.currentEpisode?.title!!, viewModel.currentEpisode?.pubDate!!,viewModel.currentEpisode?.duration!!,viewModel.currentEpisode?.description!! )
+        bottomSheetDialogFragment.updateUI(
+            viewModel.currentEpisode?.title!!,
+            viewModel.currentEpisode?.pubDate!!,
+            viewModel.currentEpisode?.duration!!,
+            viewModel.currentEpisode?.description!!
+        )
     }
 
 

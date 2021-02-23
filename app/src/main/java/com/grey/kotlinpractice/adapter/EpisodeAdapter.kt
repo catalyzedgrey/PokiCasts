@@ -1,17 +1,19 @@
 package com.grey.kotlinpractice.adapter
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.exoplayer2.Player
-import com.grey.kotlinpractice.HomeViewModel
 import com.grey.kotlinpractice.PodcastPlayerService
 import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.data.Model
+import com.grey.kotlinpractice.utils.Util
 
 
 class EpisodeAdapter(
@@ -64,11 +66,14 @@ class EpisodeAdapter(
 
         podcastPlayerService.addListener(holder)
 
-        holder.episodeReleaseDate.text = itemList[position].pubDate
+        holder.episodeReleaseDate.text = Util.stripTimeFromDateString(itemList[position].pubDate!!)
         holder.episodeTitle.text = itemList[position].title
         holder.duration.text = itemList[position].duration
 //        holder.uri = itemList[position].enclosure!!.url!!
         holder.uri = itemList[position].url!!
+
+        checkIfPlayed(holder, position)
+
 
         holder.itemView.setOnClickListener {
             sendEpisodeInfo(itemList[position])
@@ -85,6 +90,19 @@ class EpisodeAdapter(
 //            podcastPlayerService.artistTitle = itemList[position].collectionName!!
 //            podcastPlayerService.episodeTitle = holder.episodeTitle.text.toString()
 //            podcastPlayerService.artworkUrl = itemList[position].imageUrl!!
+        }
+    }
+
+    private fun checkIfPlayed(holder: EpisodeAdapter.MyViewHolder, position: Int) {
+        if(itemList[position].isMarkedPlayed == true){
+            var c = ContextCompat.getColor(context, R.color.colorAccent)
+            holder.episodeTitle.setTextColor(c)
+            holder.episodeReleaseDate.setTextColor(c)
+            holder.duration.setTextColor(c)
+        }else{
+            holder.episodeTitle.setTextColor(Color.WHITE)
+            holder.episodeReleaseDate.setTextColor(Color.WHITE)
+            holder.duration.setTextColor(Color.WHITE)
         }
     }
 

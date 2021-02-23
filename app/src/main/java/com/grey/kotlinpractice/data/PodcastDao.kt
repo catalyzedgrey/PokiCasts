@@ -27,4 +27,7 @@ interface PodcastDao {
 
     @Query("SELECT * FROM podcast WHERE feedUrl IN (:feedUrl)")
     fun findByFeedUrl(feedUrl: String): Model.Podcast
+
+    @Query("SELECT * FROM podcast WHERE uid IN (:podId)")
+    fun findById(podId: Int): Model.Podcast
 }

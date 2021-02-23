@@ -64,6 +64,7 @@ object Model {
         @ColumnInfo val imageUrl: String?,
         @ColumnInfo var currentPosition: Long?,
         @ColumnInfo var isPlaying: Boolean?,
+        @ColumnInfo var isMarkedPlayed: Boolean?,
     )
 
 

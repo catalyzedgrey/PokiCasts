@@ -146,6 +146,9 @@ class PodcastPlayerService : Service(), Player.EventListener {
 
     }
 
+    fun clearMediaItem(){
+        exoPlayer?.clearMediaItems()
+    }
 
     fun updateCurrentPlayingEpisode(episode: Model.Episode) {
         viewModel.currentEpisode = episode
@@ -209,6 +212,21 @@ class PodcastPlayerService : Service(), Player.EventListener {
 
     fun stop() {
         exoPlayer!!.stop()
+        stopForeground(true)
+        kill()
+
+    }
+
+    fun kill(){
+        if (playerNotificationManager != null) {
+            playerNotificationManager!!.setPlayer(null)
+            playerNotificationManager!!.invalidate()
+        }
+        if (exoPlayer != null) {
+            exoPlayer!!.release()
+            exoPlayer = null
+
+        }
     }
 
     fun isPlaying(): Boolean {
@@ -273,15 +291,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
 
 
     override fun onDestroy() {
-        if (playerNotificationManager != null) {
-            playerNotificationManager!!.setPlayer(null)
-            playerNotificationManager!!.invalidate()
-        }
-        if (exoPlayer != null) {
-            exoPlayer!!.release()
-            exoPlayer = null
-
-        }
+       kill()
     }
 
     override fun onBind(intent: Intent?): IBinder? {

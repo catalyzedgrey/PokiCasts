@@ -66,6 +66,8 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
     private lateinit var collapsePreview: ImageView
     private lateinit var accentbg: View
 
+    private var podId = -1
+
     //    lateinit var topBarGroup: Group
     lateinit var episodeUrl: String
 
@@ -80,7 +82,6 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
         return inflater.inflate(R.layout.fragment_episode_list, container, false)
         //return inflater.inflate(R.layout.fragment_episode_list, container, false)
     }
-
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -145,7 +146,9 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
         viewModel.isEpisodePreviewExpanded = false
     }
 
-
+    fun updateRecyclerView() {
+        adapter?.notifyDataSetChanged()
+    }
 
     fun expandBottomSheet() {
         val m = activity as MainActivity
@@ -158,7 +161,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
     }
 
 
-    fun initBottomSheetEpisodePrevie(view: View){
+    fun initBottomSheetEpisodePrevie(view: View) {
         podPreviewTitle = view.findViewById(R.id.episode_title_sheet_preview)
         podPreviewCollectionName = view.findViewById(R.id.artist_title_sheet)
         podPreviewDate = view.findViewById(R.id.sheet_date)
@@ -204,7 +207,10 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
 
         playBtn.setOnClickListener {
             viewModel.currentEpisode = itemList[adapter.currentPosition]
-            podcastPlayerService.preparePlayer(episodeUrl, viewModel.currentEpisode!!.currentPosition!!)
+            podcastPlayerService.preparePlayer(
+                episodeUrl,
+                viewModel.currentEpisode!!.currentPosition!!
+            )
             collapseBottomSheet()
         }
 
@@ -241,7 +247,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
                 itemList = result
             }
         }
-        viewModel.getLocalEpisodeList(feedUrl).observe(viewLifecycleOwner, resultObserver)
+        viewModel.getLocalEpisodeList(podId).observe(viewLifecycleOwner, resultObserver)
     }
 
 
@@ -256,7 +262,8 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
 //    }
 
 
-    fun updatePodcastIndex(feedUrl: String, artworkUrl: String, collectionName: String) {
+    fun updatePodcastIndex(podId: Int, feedUrl: String, artworkUrl: String, collectionName: String) {
+        this.podId = podId
         this.feedUrl = feedUrl
         this.artworkUrl = artworkUrl
         this.collectionName = collectionName
@@ -269,7 +276,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
 
 
     override fun sendPodcastEpisodeInfo(episode: Model.Episode) {
-        if(podcastPlayerService.isPlaying() && podcastPlayerService.currentUri == episode.url){
+        if (podcastPlayerService.isPlaying() && podcastPlayerService.currentUri == episode.url) {
             episode.isPlaying = true
             viewModel.currentEpisode = episode
             viewModel.updateEpisode()

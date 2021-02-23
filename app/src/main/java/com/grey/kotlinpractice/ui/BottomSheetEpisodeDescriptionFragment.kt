@@ -9,6 +9,7 @@ import android.view.View
 import android.widget.TextView
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.grey.kotlinpractice.R
+import com.grey.kotlinpractice.utils.Util
 import java.text.SimpleDateFormat
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -65,12 +66,14 @@ class BottomSheetEpisodeDescriptionFragment : BottomSheetDialogFragment() {
 
     fun updateUI(title: String, releaseDate: String, duration: String, description: String) {
         this.eptitle = title
-        var stringList = releaseDate.split(" ")
-        this.releaseDate = stringList[0]+ " " +stringList[1] + " "+ stringList[2] +" "+ stringList [3]
-
-
-
+        //var stringList = releaseDate.split(" ")
+        //stringList[0]+ " " +stringList[1] + " "+ stringList[2] +" "+ stringList [3]
+        this.releaseDate = Util.stripTimeFromDateString(releaseDate)
         this.duration = duration
         this.description = description
+    }
+
+    fun markAsPlayed(){
+
     }
 }

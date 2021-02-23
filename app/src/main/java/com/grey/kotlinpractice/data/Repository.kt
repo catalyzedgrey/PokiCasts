@@ -76,29 +76,32 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
         return subscribedPodcastListLiveData
     }
 
-    fun getEpisodeListLocally(feedUrl: String): MutableLiveData<List<Model.Episode>> {
-        if (feedUrl != "") {
-            coroutineScope.launch {
+    fun getEpisodeListLocally(podId: Int): MutableLiveData<List<Model.Episode>> {
+       // if (podId != "") {
 
-                var episodes: List<Model.Episode> = episodeDao.getAllByUrl(feedUrl)
-                val pod = podcastDao.findByFeedUrl(feedUrl)
-                val m: ITunesChannelData = Reader.read<ITunesChannelData>(pod.feedUrl)
+         if (podId != -1) {
+             coroutineScope.launch {
 
-                if(episodes.isEmpty() || m.items?.size!! > episodes.size){
+                 var episodes: List<Model.Episode> = episodeDao.getAllByPodId(podId)
+                 val pod = podcastDao.findById(podId)
+                 val m: ITunesChannelData = Reader.read<ITunesChannelData>(pod.feedUrl)
 
-                    episodes =
-                        episodeDao.transformItunesDatatoEpisode(
-                            m.items!!,
-                            pod.uid,
-                            pod.collectionName!!,
-                            pod.artworkUrl600!!
-                        )
-                    episodeDao.insertAll(episodes)
+                 if (episodes.isEmpty() || m.items?.size!! > episodes.size) {
 
-                }
-                episodeLiveList.postValue(episodes)
-            }
-        }
+                     episodes =
+                         episodeDao.transformItunesDatatoEpisode(
+                             m.items!!,
+                             pod.uid,
+                             pod.collectionName!!,
+                             pod.artworkUrl600!!
+                         )
+                     episodeDao.insertAll(episodes)
+
+                 }
+                 episodeLiveList.postValue(episodes)
+             }
+         }
+        //}
         return episodeLiveList
     }
 

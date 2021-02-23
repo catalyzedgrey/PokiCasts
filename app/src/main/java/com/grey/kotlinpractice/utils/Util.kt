@@ -1,10 +1,30 @@
 package com.grey.kotlinpractice.utils
 
 
-import androidx.room.ColumnInfo
-import com.grey.kotlinpractice.data.Model
+import android.annotation.SuppressLint
+import android.app.Application
+import android.content.Context
+import android.widget.Toast
 
+
+
+@SuppressLint("StaticFieldLeak")
 object Util {
+
+    lateinit var context: Context
+
+    fun stripTimeFromDateString(dateTime: String): String{
+        var stringList = dateTime.split(" ")
+        return stringList[0]+ " " +stringList[1] + " "+ stringList[2] +" "+ stringList [3]
+    }
+
+//    fun showToast(message: String ){
+//        Toast.makeText(
+//            context,
+//            message,
+//            Toast.LENGTH_SHORT
+//        ).show()
+//    }
 
 //    fun convertEpisodeToCurrentEpisode(
 //        episode: Model.Episode,

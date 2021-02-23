@@ -8,8 +8,8 @@ interface EpisodeDao {
     @Query("SELECT * FROM episode")
     fun getAll(): List<Model.Episode>
 
-    @Query("SELECT * FROM episode WHERE url Like :url")
-    fun getAllByUrl(url: String): List<Model.Episode>
+    @Query("SELECT * FROM episode WHERE podId Like :podId")
+    fun getAllByPodId(podId: Int): List<Model.Episode>
 
 //    @Query("SELECT * FROM episode WHERE uid IN (:userIds)")
 //    fun loadAllByIds(userIds: IntArray): List<Model.Podcast>
@@ -35,6 +35,9 @@ interface EpisodeDao {
     @Query("SELECT * FROM episode WHERE isPlaying LIKE 1")
     fun getCurrentPlayingEpisode(): Model.Episode
 
+    @Query("SELECT * FROM episode WHERE isMarkedPlayed LIKE 1")
+    fun getPlayedEpisode(): Model.Episode
+
     fun transformItunesDatatoEpisode(itunesItemData:  List<ITunesItemData>, podId: Int, podName: String, artworkUrl: String): List<Model.Episode>{
         val episodes: ArrayList<Model.Episode> = ArrayList()
         for(item in itunesItemData){
@@ -48,7 +51,8 @@ interface EpisodeDao {
                 collectionName = podName,
                 imageUrl = artworkUrl,
                 currentPosition = 0,
-                false
+                isPlaying = false,
+                isMarkedPlayed = false
             )
             episodes.add(e)
 

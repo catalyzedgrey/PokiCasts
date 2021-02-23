@@ -157,7 +157,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-
         android:src="@drawable/ic_outline_description_24"
         app:layout_constraintBottom_toBottomOf="@id/bottomview"
         app:layout_constraintEnd_toEndOf="@id/bottomview"
@@ -165,6 +164,7 @@
         app:layout_constraintTop_toTopOf="@id/bottomview" />
 
     <ImageView
+        android:id="@+id/bottom_mark_played"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
