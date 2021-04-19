@@ -65,10 +65,11 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     lateinit var connection: ServiceConnection
 
     lateinit var sharedpreferences: SharedPreferences
-    lateinit var speedLabel: TextView
-    lateinit var speedGroup: Group
-    lateinit var minusSpeed: ImageView
-    lateinit var plusSpeed: ImageView
+
+//    lateinit var speedLabel: TextView
+//    lateinit var speedGroup: Group
+//    lateinit var minusSpeed: ImageView
+//    lateinit var plusSpeed: ImageView
     lateinit var bottomControlDescription: ImageView
     lateinit var bottomSheetDialogFragment: BottomSheetEpisodeDescriptionFragment
     lateinit var bottomMarkPlayed: ImageView
@@ -154,7 +155,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
         initUi()
         handleBottomNavSwitching()
-        handleSpeed()
+        //handleSpeed()
     }
 
 
@@ -282,11 +283,11 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
         speedControlButton = binding.root.findViewById(R.id.speed_control)
         bottomMarkPlayed = binding.root.findViewById(R.id.bottom_mark_played)
-
-        speedGroup = binding.root.findViewById(R.id.speed_group)
-        plusSpeed = binding.root.findViewById(R.id.plus_speed)
-        minusSpeed = binding.root.findViewById(R.id.minus_speed)
-        speedLabel = binding.root.findViewById(R.id.speed_text_view)
+//
+//        speedGroup = binding.root.findViewById(R.id.speed_group)
+//        plusSpeed = binding.root.findViewById(R.id.plus_speed)
+//        minusSpeed = binding.root.findViewById(R.id.minus_speed)
+//        speedLabel = binding.root.findViewById(R.id.speed_text_view)
 
         bottomControlDescription = binding.root.findViewById(R.id.bottom_description)
 
@@ -341,10 +342,15 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     private fun handleBottomplayerControls() {
         speedControlButton.setOnClickListener {
-            if (speedGroup.visibility == View.VISIBLE) {
-                speedGroup.visibility = View.GONE
-            } else
-                speedGroup.visibility = View.VISIBLE
+
+            var bottomSheetSpeedDialogFragment = BottomSheetSpeedControlFragment()
+            bottomSheetSpeedDialogFragment.show(supportFragmentManager, bottomSheetSpeedDialogFragment.tag)
+
+
+//            if (speedGroup.visibility == View.VISIBLE) {
+//                speedGroup.visibility = View.GONE
+//            } else
+//                speedGroup.visibility = View.VISIBLE
         }
 
         bottomControlDescription.setOnClickListener {
@@ -390,35 +396,37 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
 
-    private fun handleSpeed() {
-        var speed: Float = 1f
-        plusSpeed.setOnClickListener {
-            if (speed <= 3) {
-                speed += 0.1f
-                var speedplus = String.format("%.2f", speed)
-                podcastPlayerService.changePlaybackSpeed(speedplus.toFloat())
-                if (speedplus != "1.0")
-                    speedplus = speedplus.substring(0, speedplus.length - 1)
+    fun handleSpeed(speedChange: Float ) {
+        podcastPlayerService.changePlaybackSpeed(speedChange)
 
-                speedLabel.text = speedplus + "x"
-            }
-        }
-        minusSpeed.setOnClickListener {
-            if (speed >= 0.5) {
-                speed -= 0.1f
-                var speedplus = String.format("%.2f", speed)
-                podcastPlayerService.changePlaybackSpeed(speedplus.toFloat())
-                if (speedplus != "1.0")
-                    speedplus = speedplus.substring(0, speedplus.length - 1)
-                speedLabel.text = speedplus + "x"
-            }
-        }
+//        var speed: Float = 1f
+//        plusSpeed.setOnClickListener {
+//            if (speed <= 3) {
+//                speed += 0.1f
+//                var speedplus = String.format("%.2f", speed)
+//                podcastPlayerService.changePlaybackSpeed(speedplus.toFloat())
+//                if (speedplus != "1.0")
+//                    speedplus = speedplus.substring(0, speedplus.length - 1)
+//
+//                speedLabel.text = speedplus + "x"
+//            }
+//        }
+//        minusSpeed.setOnClickListener {
+//            if (speed >= 0.5) {
+//                speed -= 0.1f
+//                var speedplus = String.format("%.2f", speed)
+//                podcastPlayerService.changePlaybackSpeed(speedplus.toFloat())
+//                if (speedplus != "1.0")
+//                    speedplus = speedplus.substring(0, speedplus.length - 1)
+//                speedLabel.text = speedplus + "x"
+//            }
+//        }
 
     }
 
     override fun onBackPressed() {
-        if (speedGroup.visibility == View.VISIBLE)
-            speedGroup.visibility = View.GONE
+//        if (speedGroup.visibility == View.VISIBLE)
+//            speedGroup.visibility = View.GONE
         //.state = BottomSheetBehavior.STATE_COLLAPSED
 
         if (bottomSheetBehavior.state == BottomSheetBehavior.STATE_EXPANDED)

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorPrimary"
+    android:fillViewport="true"
+    app:behavior_hideable="false"
+    app:behavior_peekHeight="50dp"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior"
+    android:paddingTop="20dp"
+    android:paddingBottom="20dp">
+
+
+
+    <View
+        android:id="@+id/speed_control_view"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginBottom="5dp"
+        android:background="@drawable/selectorsquaredborder"
+
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+    <TextView
+        android:id="@+id/speed_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:src="@drawable/ic_baseline_speed_24"
+        android:text="Speed"
+        android:textColor="@color/exo_white"
+        app:layout_constraintStart_toStartOf="@id/speed_control_view"
+        app:layout_constraintTop_toTopOf="@id/speed_control_view"   
+        app:layout_constraintBottom_toBottomOf="@id/speed_control_view"/>
+
+    <TextView
+        android:id="@+id/speed_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/selectorsquaredborder"
+        android:gravity="center"
+        android:padding="10dp"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+
+        android:maxLength="4"
+        android:text="1.0x"
+        android:textColor="@color/exo_white"
+
+        app:layout_constraintEnd_toEndOf="@id/speed_control_view"
+        app:layout_constraintStart_toStartOf="@id/speed_control_view"
+        app:layout_constraintTop_toTopOf="@id/speed_control_view"
+        app:layout_constraintBottom_toBottomOf="@id/speed_control_view"/>
+
+    <ImageView
+        android:id="@+id/minus_speed"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginEnd="25dp"
+        android:src="@drawable/ic_minus_round_line"
+        app:layout_constraintEnd_toStartOf="@id/speed_text_view"
+        app:layout_constraintTop_toTopOf="@id/speed_text_view"
+        app:layout_constraintBottom_toBottomOf="@id/speed_text_view"/>
+
+    <ImageView
+        android:id="@+id/plus_speed"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_marginStart="25dp"
+
+        android:src="@drawable/ic_plus_round_line"
+        app:layout_constraintStart_toEndOf="@id/speed_text_view"
+        app:layout_constraintTop_toTopOf="@id/speed_text_view"
+        app:layout_constraintBottom_toBottomOf="@id/speed_text_view"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
