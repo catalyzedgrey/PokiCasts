@@ -22,7 +22,6 @@ import androidx.lifecycle.Observer
 import androidx.palette.graphics.Palette
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.exoplayer2.Player
 import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.grey.kotlinpractice.HomeViewModel
@@ -161,7 +160,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
     }
 
 
-    fun initBottomSheetEpisodePrevie(view: View) {
+    fun initBottomSheetEpisodePreview(view: View) {
         podPreviewTitle = view.findViewById(R.id.episode_title_sheet_preview)
         podPreviewCollectionName = view.findViewById(R.id.artist_title_sheet)
         podPreviewDate = view.findViewById(R.id.sheet_date)
@@ -175,7 +174,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
     }
 
     fun initViews(view: View) {
-        initBottomSheetEpisodePrevie(view)
+        initBottomSheetEpisodePreview(view)
         playBtn = view.findViewById(R.id.play_btn)
         podIcon = view.findViewById(R.id.exoplayer_collapsed_pod_icon)
         subscribedBtn = view.findViewById(R.id.subscribed_btn)
@@ -205,14 +204,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
 
 
 
-        playBtn.setOnClickListener {
-            viewModel.currentEpisode = itemList[adapter.currentPosition]
-            podcastPlayerService.preparePlayer(
-                episodeUrl,
-                viewModel.currentEpisode!!.currentPosition!!
-            )
-            collapseBottomSheet()
-        }
+
 
     }
 
@@ -286,6 +278,15 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
         podPreviewDate.text = episode.pubDate
         podPreviewDuration.text = episode.duration
         episodeUrl = episode.url!!
+
+        playBtn.setOnClickListener {
+            viewModel.currentEpisode = episode
+            podcastPlayerService.preparePlayer(
+                episodeUrl,
+                viewModel.currentEpisode!!.currentPosition!!
+            )
+            collapseBottomSheet()
+        }
 
         Picasso.get().load(artworkUrl).resize(450, 450)
             .into(podPreviewImage)
