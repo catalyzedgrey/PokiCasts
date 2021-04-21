@@ -21,7 +21,7 @@ interface EpisodeDao {
 //    fun insertAll(vararg episode: List<ITunesItemData>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll( episode: List<Model.Episode>)
+    fun insertAll(episode: List<Model.Episode>)
 
     @Update
     fun updateEpisodeData(episode: Model.Episode)
@@ -38,24 +38,32 @@ interface EpisodeDao {
     @Query("SELECT * FROM episode WHERE isMarkedPlayed LIKE 1")
     fun getPlayedEpisode(): Model.Episode
 
-    fun transformItunesDatatoEpisode(itunesItemData:  List<ITunesItemData>, podId: Int, podName: String, artworkUrl: String): List<Model.Episode>{
+    fun transformItunesDatatoEpisode(
+        itunesItemData: List<ITunesItemData>,
+        podId: Int,
+        podName: String,
+        artworkUrl: String
+    ): List<Model.Episode> {
         val episodes: ArrayList<Model.Episode> = ArrayList()
-        for(item in itunesItemData){
-            val e = Model.Episode(
-                title = item.title,
-                url = item.enclosure!!.url!!,
-                description = item.description,
-                duration = item.duration,
-                pubDate = item.pubDate,
-                podId = podId,
-                collectionName = podName,
-                imageUrl = artworkUrl,
-                currentPosition = 0,
-                isPlaying = false,
-                isMarkedPlayed = false
-            )
-            episodes.add(e)
-
+        for (item in itunesItemData) {
+            if (item.enclosure == null || item.enclosure!!.url!! == null)
+                continue
+            else {
+                val e = Model.Episode(
+                    title = item.title,
+                    url = item.enclosure!!.url!!,
+                    description = item.description,
+                    duration = item.duration,
+                    pubDate = item.pubDate,
+                    podId = podId,
+                    collectionName = podName,
+                    imageUrl = artworkUrl,
+                    currentPosition = 0,
+                    isPlaying = false,
+                    isMarkedPlayed = false
+                )
+                episodes.add(e)
+            }
         }
 
 

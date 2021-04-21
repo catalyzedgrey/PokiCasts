@@ -307,7 +307,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
             }
 
             override fun onPrepareLoad(placeHolderDrawable: Drawable?) {
-                TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                //TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
             override fun onBitmapLoaded(bitmap: Bitmap?, from: Picasso.LoadedFrom?) {
