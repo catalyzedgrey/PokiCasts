@@ -19,6 +19,7 @@ import com.grey.kotlinpractice.data.AppDatabase
 import com.grey.kotlinpractice.data.AppDatabase.DatabaseProvider.context
 import com.grey.kotlinpractice.data.Model
 import com.grey.kotlinpractice.ui.MainActivity
+import com.grey.kotlinpractice.utils.Util
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,6 +30,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
     var exoPlayer: SimpleExoPlayer?
     lateinit var mediaItem: MediaItem
     var currentUri: String = ""
+
     //var episodeTitle: String = ""
     //var artistTitle: String = ""
     //var artworkUrl: String = ""
@@ -54,7 +56,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
         configureNotification()
     }
 
-    private fun configureNotification(){
+    private fun configureNotification() {
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
             context,
             "My_channel_id",
@@ -146,7 +148,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
 
     }
 
-    fun clearMediaItem(){
+    fun clearMediaItem() {
         exoPlayer?.clearMediaItems()
     }
 
@@ -217,7 +219,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
 
     }
 
-    fun kill(){
+    fun kill() {
         if (playerNotificationManager != null) {
             playerNotificationManager!!.setPlayer(null)
             playerNotificationManager!!.invalidate()
@@ -225,7 +227,13 @@ class PodcastPlayerService : Service(), Player.EventListener {
         if (exoPlayer != null) {
             exoPlayer!!.release()
             exoPlayer = null
+        }
+    }
 
+    fun setSkipSilence(isEnabled: Boolean) {
+        if (exoPlayer != null) {
+            exoPlayer!!.skipSilenceEnabled = isEnabled
+            Util.showToast(isEnabled.toString())
         }
     }
 
@@ -233,7 +241,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
         return exoPlayer!!.isPlaying
     }
 
-    fun changePlaybackSpeed(speed: Float){
+    fun changePlaybackSpeed(speed: Float) {
         val param = PlaybackParameters(speed)
         exoPlayer?.setPlaybackParameters(param)
 
@@ -291,7 +299,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
 
 
     override fun onDestroy() {
-       kill()
+        kill()
     }
 
     override fun onBind(intent: Intent?): IBinder? {

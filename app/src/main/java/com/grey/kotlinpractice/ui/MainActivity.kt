@@ -36,7 +36,7 @@ import kotlinx.android.synthetic.main.bottomsheet_player.*
 
 
 class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Player.EventListener,
-    TimeBar.OnScrubListener {
+    TimeBar.OnScrubListener, SettingsFragment.OnSwitchToggled {
 
     lateinit var binding: ActivityMainBinding
     private val homeFragment = HomeFragment()
@@ -66,7 +66,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     lateinit var sharedpreferences: SharedPreferences
 
-//    lateinit var speedLabel: TextView
+    //    lateinit var speedLabel: TextView
 //    lateinit var speedGroup: Group
 //    lateinit var minusSpeed: ImageView
 //    lateinit var plusSpeed: ImageView
@@ -204,6 +204,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     override fun onAttachFragment(fragment: Fragment) {
         if (fragment is HomeFragment) {
             fragment.setOnItemClickedListener(this)
+        } else if (fragment is SettingsFragment) {
+            fragment.setOnSwitchToggledListener(this)
         }
     }
 
@@ -344,7 +346,10 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         speedControlButton.setOnClickListener {
 
             var bottomSheetSpeedDialogFragment = BottomSheetSpeedControlFragment()
-            bottomSheetSpeedDialogFragment.show(supportFragmentManager, bottomSheetSpeedDialogFragment.tag)
+            bottomSheetSpeedDialogFragment.show(
+                supportFragmentManager,
+                bottomSheetSpeedDialogFragment.tag
+            )
 
 
 //            if (speedGroup.visibility == View.VISIBLE) {
@@ -366,7 +371,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     }
 
-    private fun clearEpisodeWhenMarkedPlay(){
+    private fun clearEpisodeWhenMarkedPlay() {
         viewModel.currentEpisode = null
         viewModel.currentEpisode?.isMarkedPlayed = true
         viewModel.updateEpisode()
@@ -375,7 +380,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         playerView.player?.clearMediaItems()
         playerView.player?.release()
         playerView.invalidate()
-        playerView.findViewById<ImageView>(R.id.exo_play_pause).setImageResource(R.drawable.exo_ic_play_circle_filled)
+        playerView.findViewById<ImageView>(R.id.exo_play_pause)
+            .setImageResource(R.drawable.exo_ic_play_circle_filled)
         podcastPlayerService.stop()
         podcastPlayerService.clearMediaItem()
 
@@ -383,9 +389,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         exoplayerCollapsedPodIcon.setImageResource(R.drawable.exo_ic_default_album_image)
 
 
-
-
     }
+
     private fun updateEpisodeDescriptionBottomSheet() {
         bottomSheetDialogFragment.updateUI(
             viewModel.currentEpisode?.title!!,
@@ -396,7 +401,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
 
-    fun handleSpeed(speedChange: Float ) {
+    fun handleSpeed(speedChange: Float) {
         podcastPlayerService.changePlaybackSpeed(speedChange)
 
 //        var speed: Float = 1f
@@ -475,6 +480,14 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     }
 
+    override fun onSortSwitchChanged(isChecked: Boolean) {
+        homeFragment.sortGridViewDescendingly(isChecked)
+    }
+
+    override fun onSkipSilenceSwitchChanged(isChecked: Boolean) {
+        podcastPlayerService.setSkipSilence(isChecked)
+    }
+
 
     override fun onDestroy() {
         podcastPlayerService.release()
@@ -500,6 +513,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         timeBar.setEnabled(false)
         return
     }
+
+
 //endregion
 }
 

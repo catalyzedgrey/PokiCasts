@@ -18,13 +18,13 @@ object Util {
         return stringList[0]+ " " +stringList[1] + " "+ stringList[2] +" "+ stringList [3]
     }
 
-//    fun showToast(message: String ){
-//        Toast.makeText(
-//            context,
-//            message,
-//            Toast.LENGTH_SHORT
-//        ).show()
-//    }
+    fun showToast(message: String ){
+        Toast.makeText(
+            context,
+            message,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
 
 //    fun convertEpisodeToCurrentEpisode(
 //        episode: Model.Episode,

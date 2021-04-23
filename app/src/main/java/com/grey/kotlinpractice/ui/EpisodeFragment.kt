@@ -267,6 +267,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
     }
 
 
+
     override fun sendPodcastEpisodeInfo(episode: Model.Episode) {
         if (podcastPlayerService.isPlaying() && podcastPlayerService.currentUri == episode.url) {
             episode.isPlaying = true

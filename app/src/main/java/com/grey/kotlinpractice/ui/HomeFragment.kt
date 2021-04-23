@@ -57,13 +57,28 @@ class HomeFragment : Fragment() {
         val gridObserver = Observer<List<Model.Podcast>> { result ->
             // Update the UI
             itemList = result as ArrayList<Model.Podcast>
-            itemList.sortByDescending {
-                it.releaseDate
-            }
-            adapter.updateList(result as ArrayList<Model.Podcast>)
+//            sortGridViewDescendingly(false)
         }
         viewModel.getSubscribedPodcasts().observe(viewLifecycleOwner, gridObserver)
 
+
+    }
+
+
+    fun sortGridViewDescendingly(isDescendingTrue: Boolean){
+        if(itemList != null){
+            if(isDescendingTrue){
+                itemList.sortByDescending {
+                    it.releaseDate
+                }
+            }else{
+                itemList.sortBy {
+                    it.releaseDate
+                }
+
+            }
+            adapter.updateList(itemList as ArrayList<Model.Podcast>)
+        }
 
     }
 
