@@ -6,14 +6,13 @@ package com.grey.kotlinpractice.ui
 import android.content.*
 import android.os.Bundle
 import android.os.IBinder
-import android.text.Html
+import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.Group
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import com.google.android.exoplayer2.Player
@@ -22,7 +21,6 @@ import com.google.android.exoplayer2.ui.StyledPlayerControlView
 import com.google.android.exoplayer2.ui.TimeBar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
-import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.grey.kotlinpractice.HomeViewModel
 import com.grey.kotlinpractice.PodcastPlayerService
 import com.grey.kotlinpractice.R
@@ -33,6 +31,7 @@ import com.grey.kotlinpractice.utils.Util
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.bottomsheet_episode_description.*
 import kotlinx.android.synthetic.main.bottomsheet_player.*
+import kotlin.properties.Delegates
 
 
 class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Player.EventListener,
@@ -76,6 +75,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
 
     private val viewModel: HomeViewModel by viewModels()
+
 
 
     fun updatePlayerUI() {
@@ -125,12 +125,17 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         }
 
         sharedpreferences = getSharedPreferences("prefs", MODE_PRIVATE)
+
+
+        initNecessaryComponents()
+
         val activity = this
         connection =
             object : ServiceConnection {
                 override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                     val binder = service as PodcastPlayerService.MyLocalBinder
                     podcastPlayerService = binder.getService()
+                    podcastPlayerService.setSkipSilence(viewModel.isSkippingSilence)
                     playerView.player = podcastPlayerService.exoPlayer
                     bottomPlayerView.player = podcastPlayerService.exoPlayer
                     isBound = true
@@ -153,9 +158,27 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         val intent = Intent(this, PodcastPlayerService::class.java)
         bindService(intent, connection, Context.BIND_AUTO_CREATE)
 
+
         initUi()
         handleBottomNavSwitching()
+
         //handleSpeed()
+    }
+
+    private fun initNecessaryComponents(){
+        AppDatabase.DatabaseProvider.context = applicationContext
+        viewModel.isSortingDesc = sharedpreferences.getBoolean("isSortingDesc", true)
+        viewModel.isSkippingSilence = sharedpreferences.getBoolean("isSkippingSilence", false)
+
+
+
+        var myVariableName by Delegates.observable(0) { property, oldValue, newValue ->
+
+        }
+
+
+
+
     }
 
 
@@ -204,7 +227,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     override fun onAttachFragment(fragment: Fragment) {
         if (fragment is HomeFragment) {
             fragment.setOnItemClickedListener(this)
-        } else if (fragment is SettingsFragment) {
+        }
+        else if (fragment is SettingsFragment) {
             fragment.setOnSwitchToggledListener(this)
         }
     }
@@ -267,7 +291,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     private fun initUi() {
 
-        AppDatabase.DatabaseProvider.context = applicationContext
+
+
         bottomNavigationView = binding.root.findViewById(R.id.bottomNavigationView)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 //        bottomSheetEpisodeDescriptionBehavior = BottomSheetBehavior.from(
@@ -295,7 +320,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
 
 
-        handleBottomplayerControls()
+        handleBottomPlayerControls()
 
 
 
@@ -342,7 +367,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     }
 
-    private fun handleBottomplayerControls() {
+    private fun handleBottomPlayerControls() {
         speedControlButton.setOnClickListener {
 
             var bottomSheetSpeedDialogFragment = BottomSheetSpeedControlFragment()
@@ -460,28 +485,22 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
 
     override fun onStop() {
         super.onStop()
+        val editor: SharedPreferences.Editor = sharedpreferences.edit()
+        editor.putBoolean("isSortingDesc", viewModel.isSortingDesc)
+        editor.putBoolean("isSkippingSilence", viewModel.isSkippingSilence)
         if (viewModel.currentEpisode != null) {
             //val currentEpisode: Model.CurrentEpisode = Util.convertEpisodeToCurrentEpisode(viewModel.currentEpisode!!, podcastPlayerService.exoPlayer!!.currentPosition)
             //viewModel.saveLastPlayedPodcastInfo(currentEpisode)
 
-
             viewModel.currentEpisode!!.currentPosition =
                 podcastPlayerService.exoPlayer!!.currentPosition
             viewModel.saveLastPlayedPodcastInfo(viewModel.currentEpisode!!)
-            val editor: SharedPreferences.Editor = sharedpreferences.edit()
             editor.putString("urlKey", viewModel.currentEpisode!!.url!!)
-            editor.commit()
-
-
         }
-
+        editor.commit()
         //PodcastPlayerService.release()
         //PodcastPlayerService.onDestroy()
 
-    }
-
-    override fun onSortSwitchChanged(isChecked: Boolean) {
-        homeFragment.sortGridViewDescendingly(isChecked)
     }
 
     override fun onSkipSilenceSwitchChanged(isChecked: Boolean) {
@@ -513,9 +532,9 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         timeBar.setEnabled(false)
         return
     }
+    //endregion
 
 
-//endregion
 }
 
 

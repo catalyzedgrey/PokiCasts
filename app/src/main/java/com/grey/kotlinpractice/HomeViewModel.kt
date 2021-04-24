@@ -9,6 +9,7 @@ import com.grey.kotlinpractice.di.component.ViewModelComponent
 import kotlinx.coroutines.*
 import tw.ktrssreader.model.channel.ITunesChannelData
 import javax.inject.Inject
+import kotlin.properties.Delegates
 
 
 class HomeViewModel @Inject constructor(private val savedStateHandle: SavedStateHandle) :
@@ -27,6 +28,9 @@ class HomeViewModel @Inject constructor(private val savedStateHandle: SavedState
     var isEpisodePreviewExpanded: Boolean = false
 
     var currentEpisode: Model.Episode? = null
+
+    var isSortingDesc: Boolean = true
+    var isSkippingSilence = false
 
     init {
         inject()
@@ -105,6 +109,8 @@ class HomeViewModel @Inject constructor(private val savedStateHandle: SavedState
         if (currentEpisode != null)
             repository.updateEpisode(currentEpisode!!)
     }
+
+
 
 //    fun saveLastPlayedPodcastInfo(episode: Model.CurrentEpisode) {
 //        repository.saveLastPlayedPodcastInfo(episode)

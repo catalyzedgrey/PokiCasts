@@ -57,7 +57,7 @@ class HomeFragment : Fragment() {
         val gridObserver = Observer<List<Model.Podcast>> { result ->
             // Update the UI
             itemList = result as ArrayList<Model.Podcast>
-//            sortGridViewDescendingly(false)
+            sortGridViewDescendingly(viewModel.isSortingDesc)
         }
         viewModel.getSubscribedPodcasts().observe(viewLifecycleOwner, gridObserver)
 
