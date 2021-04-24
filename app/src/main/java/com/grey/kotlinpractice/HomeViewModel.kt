@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import com.grey.kotlinpractice.data.*
 import com.grey.kotlinpractice.di.component.DaggerViewModelComponent
 import com.grey.kotlinpractice.di.component.ViewModelComponent
+import com.grey.kotlinpractice.utils.Util
 import kotlinx.coroutines.*
 import tw.ktrssreader.model.channel.ITunesChannelData
 import javax.inject.Inject
@@ -24,6 +25,7 @@ class HomeViewModel @Inject constructor(private val savedStateHandle: SavedState
 
     //private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
+
     var isPlayerfExpanded: Boolean = false
     var isEpisodePreviewExpanded: Boolean = false
 
@@ -31,6 +33,8 @@ class HomeViewModel @Inject constructor(private val savedStateHandle: SavedState
 
     var isSortingDesc: Boolean = true
     var isSkippingSilence = false
+
+    var homeIconSize = Util.HOME_BIG_ICONS
 
     init {
         inject()

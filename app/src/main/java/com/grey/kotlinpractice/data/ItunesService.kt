@@ -11,23 +11,10 @@ import retrofit2.http.Query
 
 interface ItunesService {
 
-    //search?term=waypoint&media=podcast
-//    @GET("search?")
-//    fun getResults(
-//        @Query("term") term: String,
-//        @Query("media") media: String ="podcast"): Observable<Model.Results>
-
-
     @GET("search?")
     fun getResults(
         @Query("term") term: String,
         @Query("media") media: String ="podcast"): Observable<Model.Results>
-
-
-//    @GET("search?")
-//    fun getResults(
-//        @Query("term") term: String,
-//        @Query("media") media: String ="podcast"): Call<Model.Results>
 
 
 //    companion object {

@@ -13,6 +13,9 @@ object Util {
 
     lateinit var context: Context
 
+    val HOME_BIG_ICONS = 3
+    val HOME_SMALL_ICONS = 4
+
     fun stripTimeFromDateString(dateTime: String): String{
         var stringList = dateTime.split(" ")
         return stringList[0]+ " " +stringList[1] + " "+ stringList[2] +" "+ stringList [3]

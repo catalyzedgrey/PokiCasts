@@ -36,7 +36,7 @@ class SearchFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel.searchForPodcast("waypoint")
+        viewModel.searchForPodcast("")
         searchView = view.findViewById(R.id.searchView)
         searchView.setOnClickListener { searchView.isIconified = false }
         changeTextColor()

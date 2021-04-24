@@ -169,16 +169,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         AppDatabase.DatabaseProvider.context = applicationContext
         viewModel.isSortingDesc = sharedpreferences.getBoolean("isSortingDesc", true)
         viewModel.isSkippingSilence = sharedpreferences.getBoolean("isSkippingSilence", false)
-
-
-
-        var myVariableName by Delegates.observable(0) { property, oldValue, newValue ->
-
-        }
-
-
-
-
+        viewModel.homeIconSize = sharedpreferences.getInt("homeIconSize", Util.HOME_BIG_ICONS)
     }
 
 
@@ -488,6 +479,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         val editor: SharedPreferences.Editor = sharedpreferences.edit()
         editor.putBoolean("isSortingDesc", viewModel.isSortingDesc)
         editor.putBoolean("isSkippingSilence", viewModel.isSkippingSilence)
+        editor.putInt("homeIconSize", viewModel.homeIconSize)
         if (viewModel.currentEpisode != null) {
             //val currentEpisode: Model.CurrentEpisode = Util.convertEpisodeToCurrentEpisode(viewModel.currentEpisode!!, podcastPlayerService.exoPlayer!!.currentPosition)
             //viewModel.saveLastPlayedPodcastInfo(currentEpisode)
@@ -506,6 +498,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     override fun onSkipSilenceSwitchChanged(isChecked: Boolean) {
         podcastPlayerService.setSkipSilence(isChecked)
     }
+
 
 
     override fun onDestroy() {

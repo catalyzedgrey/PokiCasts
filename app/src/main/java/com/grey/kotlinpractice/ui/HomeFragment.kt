@@ -13,6 +13,7 @@ import com.grey.kotlinpractice.R
 import com.grey.kotlinpractice.adapter.HomeAdapter
 //import com.grey.kotlinpractice.adapter.PodcastHomeAdapter
 import com.grey.kotlinpractice.data.Model
+import okhttp3.internal.notify
 
 class HomeFragment : Fragment() {
 
@@ -48,6 +49,7 @@ class HomeFragment : Fragment() {
         adapter = HomeAdapter(view.context, R.layout.home_list_item, itemList)
         gridView.adapter = adapter
 
+        gridView.numColumns = viewModel.homeIconSize
 
         gridView.setOnItemClickListener{ _, _, position, _ ->
             SendPodcastFeedUrl( itemList[position].uid, itemList[position].feedUrl, itemList[position].artworkUrl600!!, itemList[position].collectionName!!)
@@ -61,9 +63,7 @@ class HomeFragment : Fragment() {
         }
         viewModel.getSubscribedPodcasts().observe(viewLifecycleOwner, gridObserver)
 
-
     }
-
 
     fun sortGridViewDescendingly(isDescendingTrue: Boolean){
         if(itemList != null){

@@ -41,8 +41,8 @@ class HomeAdapter(context: Context, private val resource: Int, private var itemL
         Picasso.get().load(itemList[position].artworkUrl600).into(holder.podIcon)
 
         return mConvertView!!
-
     }
+
 
     fun updateList(newList: ArrayList<Model.Podcast>) {
         itemList.clear()

@@ -233,7 +233,6 @@ class PodcastPlayerService : Service(), Player.EventListener {
     fun setSkipSilence(isEnabled: Boolean) {
         if (exoPlayer != null) {
             exoPlayer!!.skipSilenceEnabled = isEnabled
-            Util.showToast(isEnabled.toString())
         }
     }
 
