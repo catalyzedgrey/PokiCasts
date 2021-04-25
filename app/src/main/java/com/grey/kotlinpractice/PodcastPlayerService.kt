@@ -154,6 +154,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
 
     fun updateCurrentPlayingEpisode(episode: Model.Episode) {
         viewModel.currentEpisode = episode
+        viewModel.currentEpisode!!.isMarkedPlayed = false
         loadBitmap()
     }
 
@@ -192,9 +193,23 @@ class PodcastPlayerService : Service(), Player.EventListener {
             play()
         } else if (currentUri == uri && isPlaying())
             pause()
-        else if (currentUri == uri && !isPlaying())
-            play()
+        else if (currentUri == uri && !isPlaying()){
+            if(position != 0L)
+                play()
+            else{
+                exoPlayer!!.clearMediaItems()
+                //stop()
 
+                currentUri = uri
+                mediaItem = MediaItem.fromUri(Uri.parse(uri))
+                // Set the media item to be played.
+                exoPlayer!!.setMediaItem(mediaItem)
+                // Prepare the player.
+                exoPlayer!!.prepare()
+                // Start the playback.
+                play()
+            }
+        }
     }
 
     override fun onIsPlayingChanged(isPlaying: Boolean) {
@@ -212,6 +227,11 @@ class PodcastPlayerService : Service(), Player.EventListener {
         exoPlayer!!.pause()
     }
 
+    fun softStop() {
+        exoPlayer!!.stop()
+        stopForeground(true)
+
+    }
     fun stop() {
         exoPlayer!!.stop()
         stopForeground(true)

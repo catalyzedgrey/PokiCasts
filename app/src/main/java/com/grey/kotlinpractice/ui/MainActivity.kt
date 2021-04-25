@@ -395,12 +395,13 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         viewModel.currentEpisode = null
         episodeFragment.updateRecyclerView()
 //        playerView.player?.stop()
-        playerView.player?.clearMediaItems()
+//        playerView.player?.clearMediaItems()
 //        playerView.player?.release()
 //        playerView.invalidate()
         playerView.findViewById<ImageView>(R.id.exo_play_pause)
             .setImageResource(R.drawable.exo_ic_play_circle_filled)
-        podcastPlayerService.stop()
+//        podcastPlayerService.stop()
+        podcastPlayerService.softStop()
         podcastPlayerService.clearMediaItem()
 
         collapseBottomSheet()

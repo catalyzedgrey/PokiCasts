@@ -85,6 +85,8 @@ class EpisodeAdapter(
             currentPosition = position
             holder.podcastPlayerService = podcastPlayerService
             podcastPlayerService.updateCurrentPlayingEpisode(itemList[position])
+            itemList[position].isMarkedPlayed = false
+            checkIfPlayed(holder, position)
 //            sendPodcastEpisodeInfo(itemList[position].enclosure!!.url!!)
             sendPodcastEpisodeInfo(itemList[position].url!!)
 //            podcastPlayerService.artistTitle = itemList[position].collectionName!!

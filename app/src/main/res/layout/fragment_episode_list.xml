@@ -11,7 +11,8 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar_head"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        >
 
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
@@ -24,6 +25,7 @@
                 android:id="@+id/accent_toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
+                android:paddingTop="15dp"
                 />
 
             <ImageView
@@ -31,12 +33,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="5dp"
+                android:layout_marginTop="10dp"
                 android:layout_marginBottom="5dp"
                 app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
                 app:layout_constraintBottom_toTopOf="@id/recyclerView"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                android:elevation="1dp"/>
 
             <ImageView
                 android:id="@+id/subscribed_btn"
