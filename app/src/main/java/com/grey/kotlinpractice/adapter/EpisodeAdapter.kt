@@ -95,7 +95,7 @@ class EpisodeAdapter(
 
     private fun checkIfPlayed(holder: EpisodeAdapter.MyViewHolder, position: Int) {
         if(itemList[position].isMarkedPlayed == true){
-            var c = ContextCompat.getColor(context, R.color.colorAccent)
+            var c = ContextCompat.getColor(context, R.color.playedText)
             holder.episodeTitle.setTextColor(c)
             holder.episodeReleaseDate.setTextColor(c)
             holder.duration.setTextColor(c)

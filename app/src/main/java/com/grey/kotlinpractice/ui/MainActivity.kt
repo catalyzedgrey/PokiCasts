@@ -388,14 +388,16 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
     private fun clearEpisodeWhenMarkedPlay() {
-        viewModel.currentEpisode = null
+
         viewModel.currentEpisode?.isMarkedPlayed = true
+        viewModel.currentEpisode?.currentPosition = 0
         viewModel.updateEpisode()
+        viewModel.currentEpisode = null
         episodeFragment.updateRecyclerView()
 //        playerView.player?.stop()
         playerView.player?.clearMediaItems()
-        playerView.player?.release()
-        playerView.invalidate()
+//        playerView.player?.release()
+//        playerView.invalidate()
         playerView.findViewById<ImageView>(R.id.exo_play_pause)
             .setImageResource(R.drawable.exo_ic_play_circle_filled)
         podcastPlayerService.stop()

@@ -4,8 +4,7 @@
     <color name="colorPrimaryDark">#000000</color>
     <color name="colorAccent">#666666</color>
     <color name="colorLightAccent">#FFFFFF</color>
-
     <color name="colorSelected">#46DA5F</color>
-
     <color name="transparent">#00000000</color>
+    <color name="playedText">#9AFFFFFF</color>
 </resources>

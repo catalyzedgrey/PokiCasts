@@ -146,7 +146,12 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
     }
 
     fun updateRecyclerView() {
-        adapter?.notifyDataSetChanged()
+        try {
+            adapter?.notifyDataSetChanged()
+        }catch (e: Exception){
+
+        }
+
     }
 
     fun expandBottomSheet() {
