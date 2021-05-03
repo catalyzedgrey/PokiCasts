@@ -16,6 +16,11 @@ interface ItunesService {
         @Query("term") term: String,
         @Query("media") media: String ="podcast"): Observable<Model.Results>
 
+    @GET("lookup?")
+    fun getUpdatedPodcast(
+        @Query("id") collectionId: String
+    ): Observable<Model.Results>
+
 
 //    companion object {
 //        fun create(): ItunesService {

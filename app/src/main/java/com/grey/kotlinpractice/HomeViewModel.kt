@@ -56,8 +56,6 @@ class HomeViewModel @Inject constructor(private val savedStateHandle: SavedState
 
 
     fun getSubscribedPodcasts(): LiveData<List<Model.Podcast>> {
-
-
         return repository.getSubscribedPodcastList()
     }
 
@@ -114,6 +112,10 @@ class HomeViewModel @Inject constructor(private val savedStateHandle: SavedState
             repository.updateEpisode(currentEpisode!!)
     }
 
+
+    fun getUpdatedPodcastResult(collectionId: String){
+        repository.getUpdatedPodcasts(collectionId)
+    }
 
 
 //    fun saveLastPlayedPodcastInfo(episode: Model.CurrentEpisode) {

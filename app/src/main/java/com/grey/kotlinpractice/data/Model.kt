@@ -18,6 +18,9 @@ object Model {
     @Entity
     data class Podcast(
         @PrimaryKey(autoGenerate = true) val uid: Int,
+        @ColumnInfo
+        @SerializedName("collectionId")
+        val collectionId: String,
         @ColumnInfo val artistName: String,
         @ColumnInfo val feedUrl: String,
         @ColumnInfo
