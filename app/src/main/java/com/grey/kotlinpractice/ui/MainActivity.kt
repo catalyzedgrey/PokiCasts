@@ -4,6 +4,7 @@ package com.grey.kotlinpractice.ui
 //import com.grey.kotlinpractice.di.component.ContextComponent
 //import com.grey.kotlinpractice.di.component.DaggerContextComponent
 import android.content.*
+import android.opengl.Visibility
 import android.os.Bundle
 import android.os.IBinder
 import android.util.Log
@@ -225,7 +226,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
     override fun sendPodcastIndex(
-        podId: Int,
+        podId: String,
         podcastPosIndex: String,
         artworkUrl: String,
         collectionName: String
@@ -281,9 +282,6 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     }
 
     private fun initUi() {
-
-
-
         bottomNavigationView = binding.root.findViewById(R.id.bottomNavigationView)
         bottomSheetBehavior = BottomSheetBehavior.from(bottomSheet)
 //        bottomSheetEpisodeDescriptionBehavior = BottomSheetBehavior.from(
@@ -314,7 +312,8 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
         handleBottomPlayerControls()
 
 
-
+        if(viewModel.currentEpisode == null)
+            playerView.visibility = View.GONE
 
 
         defaultTimeBar = binding.root.findViewById<DefaultTimeBar>(R.id.exo_progress)
@@ -465,6 +464,7 @@ class MainActivity : AppCompatActivity(), HomeFragment.ItemClickedListener, Play
     override fun onIsPlayingChanged(isPlaying: Boolean) {
         super.onIsPlayingChanged(isPlaying)
         if (isPlaying) {
+            playerView.visibility = View.VISIBLE
             //val epTitle = podcastPlayerService.episodeTitle //.getEpisodeTitle()
             //val artistName = podcastPlayerService.artistTitle //getArtistTitle()
 

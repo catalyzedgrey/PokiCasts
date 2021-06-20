@@ -9,7 +9,7 @@ interface EpisodeDao {
     fun getAll(): List<Model.Episode>
 
     @Query("SELECT * FROM episode WHERE podId Like :podId")
-    fun getAllByPodId(podId: Int): List<Model.Episode>
+    fun getAllByPodId(podId: String): List<Model.Episode>
 
 //    @Query("SELECT * FROM episode WHERE uid IN (:userIds)")
 //    fun loadAllByIds(userIds: IntArray): List<Model.Podcast>
@@ -40,7 +40,7 @@ interface EpisodeDao {
 
     fun transformItunesDatatoEpisode(
         itunesItemData: List<ITunesItemData>,
-        podId: Int,
+        podId: String,
         podName: String,
         artworkUrl: String
     ): List<Model.Episode> {

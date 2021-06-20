@@ -9,6 +9,7 @@ import io.reactivex.schedulers.Schedulers
 import kotlinx.coroutines.*
 import tw.ktrssreader.Reader
 import tw.ktrssreader.model.channel.*
+import java.util.*
 import javax.inject.Inject
 
 
@@ -25,8 +26,8 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
         MutableLiveData<Model.Results>()
     }
 
-    private val podcastUpdateResultLiveData: MutableLiveData<Model.Results> by lazy {
-        MutableLiveData<Model.Results>()
+    private val podcastUpdateResultLiveData: MutableLiveData<List<Model.Podcast>> by lazy {
+        MutableLiveData<List<Model.Podcast>>()
     }
 
     private val remoteEpisodeListLiveData: MutableLiveData<ITunesChannelData> by lazy {
@@ -57,21 +58,42 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
         return podcastSearchResultLiveData
     }
 
-    fun getUpdatedPodcasts(collectionId: String) {
-        if (collectionId != "") {
-            subscription =
-                webservice.getUpdatedPodcast(collectionId).subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe({ response ->
-                        //podcastUpdateResultLiveData.value = response
-                        coroutineScope.launch {
-                            podcastDao.updatePodcastData(response.results[0])
-                            subscribedPodcastListLiveData.postValue(podcastDao.getAll())
-                        }
-                    }, { t -> onFailure(t) })
+    suspend fun updatePodcastDB() {
+        withContext(Dispatchers.IO) {
+
+            podcastUpdateResultLiveData.postValue(podcastDao.getAll())
+
+        }
+    }
+
+    suspend fun updatePodcastNetwork() {
+
+
+            val podList = podcastDao.getAll()
+
+            for (i in podList.indices) {
+
+                    subscription =
+                        webservice.getUpdatedPodcast(podList[i].collectionId)
+                            .subscribeOn(Schedulers.io())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribeOn(Schedulers.io())
+                            .subscribe({ response ->
+                                coroutineScope.launch {
+                                    podcastDao.updatePodcastData(response.results[0])
+                                }
+                                //podcastUpdateResultLiveData.value = response
+                            }, { t -> onFailure(t) })
+
+            }
         }
 
+
+    fun getUpdatedPodcasts(): MutableLiveData<List<Model.Podcast>> {
+        coroutineScope.launch {
+            updatePodcastDB()
+        }
+        return podcastUpdateResultLiveData
     }
 
 
@@ -96,10 +118,10 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
         return subscribedPodcastListLiveData
     }
 
-    fun getEpisodeListLocally(podId: Int): MutableLiveData<List<Model.Episode>> {
+    fun getEpisodeListLocally(podId: String): MutableLiveData<List<Model.Episode>> {
         // if (podId != "") {
 
-        if (podId != -1) {
+        if (podId != "") {
             coroutineScope.launch {
 
                 var episodes: List<Model.Episode> = episodeDao.getAllByPodId(podId)
@@ -111,7 +133,7 @@ class Repository @Inject constructor(private val webservice: ItunesService) {
                     episodes =
                         episodeDao.transformItunesDatatoEpisode(
                             m.items!!,
-                            pod.uid,
+                            pod.collectionId,
                             pod.collectionName!!,
                             pod.artworkUrl600!!
                         )

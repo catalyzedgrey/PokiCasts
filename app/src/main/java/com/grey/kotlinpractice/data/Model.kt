@@ -17,8 +17,7 @@ object Model {
 
     @Entity
     data class Podcast(
-        @PrimaryKey(autoGenerate = true) val uid: Int,
-        @ColumnInfo
+        @PrimaryKey(autoGenerate = false)
         @SerializedName("collectionId")
         val collectionId: String,
         @ColumnInfo val artistName: String,
@@ -48,7 +47,7 @@ object Model {
         foreignKeys = [
             ForeignKey(
                 entity = Model.Podcast::class,
-                parentColumns = arrayOf("uid"),
+                parentColumns = arrayOf("collectionId"),
                 childColumns = arrayOf("podId"),
                 onDelete = ForeignKey.CASCADE
             )
@@ -62,7 +61,7 @@ object Model {
         @ColumnInfo val description: String?,
         @ColumnInfo val duration: String?,
         @ColumnInfo val pubDate: String?,
-        @ColumnInfo val podId: Int?,
+        @ColumnInfo val podId: String?,
         @ColumnInfo val collectionName: String?,
         @ColumnInfo val imageUrl: String?,
         @ColumnInfo var currentPosition: Long?,

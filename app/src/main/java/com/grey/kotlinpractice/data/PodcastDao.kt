@@ -7,7 +7,7 @@ interface PodcastDao {
     @Query("SELECT * FROM podcast")
     fun getAll(): List<Model.Podcast>
 
-    @Query("SELECT * FROM podcast WHERE uid IN (:userIds)")
+    @Query("SELECT * FROM podcast WHERE collectionId IN (:userIds)")
     fun loadAllByIds(userIds: IntArray): List<Model.Podcast>
 
     @Query("SELECT * FROM podcast WHERE artistName LIKE :name "+ "LIMIT 1")
@@ -28,6 +28,6 @@ interface PodcastDao {
     @Query("SELECT * FROM podcast WHERE feedUrl IN (:feedUrl)")
     fun findByFeedUrl(feedUrl: String): Model.Podcast
 
-    @Query("SELECT * FROM podcast WHERE uid IN (:podId)")
-    fun findById(podId: Int): Model.Podcast
+    @Query("SELECT * FROM podcast WHERE collectionId IN (:podId)")
+    fun findById(podId: String): Model.Podcast
 }

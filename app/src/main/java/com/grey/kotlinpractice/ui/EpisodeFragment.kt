@@ -65,7 +65,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
     private lateinit var collapsePreview: ImageView
     private lateinit var accentbg: View
 
-    private var podId = -1
+    private var podId = ""
 
     //    lateinit var topBarGroup: Group
     lateinit var episodeUrl: String
@@ -259,7 +259,7 @@ class EpisodeFragment : Fragment(), EpisodeAdapter.PlayButtonClickedListener,
 //    }
 
 
-    fun updatePodcastIndex(podId: Int, feedUrl: String, artworkUrl: String, collectionName: String) {
+    fun updatePodcastIndex(podId: String, feedUrl: String, artworkUrl: String, collectionName: String) {
         this.podId = podId
         this.feedUrl = feedUrl
         this.artworkUrl = artworkUrl

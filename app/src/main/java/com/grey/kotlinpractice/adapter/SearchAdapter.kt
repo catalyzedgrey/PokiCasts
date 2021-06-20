@@ -70,7 +70,7 @@ class SearchAdapter(
     //Replace the contents of a view
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-        Picasso.get().load(allResults[position].artworkUrl600!!).resize(200,200).into(holder.podIcon)
+        Picasso.get().load(allResults[position].artworkUrl600!!).into(holder.podIcon)
         holder.artistName.text = allResults[position].artistName
         holder.title.text = allResults[position].collectionName
 
@@ -82,6 +82,8 @@ class SearchAdapter(
 
             if(pod != null && allResults[position].feedUrl == pod.feedUrl)
                 holder.subscribeBtn.setImageResource(R.drawable.ic_baseline_check_circle_24)
+            else
+                holder.subscribeBtn.setImageResource(R.drawable.ic_baseline_add_circle_outline_white_24)
         }
 
 

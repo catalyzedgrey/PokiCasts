@@ -1,15 +1,19 @@
 package com.grey.kotlinpractice
 
+import android.R
 import android.app.Notification
 import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.content.res.Resources
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Binder
 import android.os.IBinder
+import android.widget.Toast
 import androidx.core.app.NotificationCompat
 import androidx.palette.graphics.Palette
 import com.google.android.exoplayer2.*
@@ -19,7 +23,6 @@ import com.grey.kotlinpractice.data.AppDatabase
 import com.grey.kotlinpractice.data.AppDatabase.DatabaseProvider.context
 import com.grey.kotlinpractice.data.Model
 import com.grey.kotlinpractice.ui.MainActivity
-import com.grey.kotlinpractice.utils.Util
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -57,12 +60,13 @@ class PodcastPlayerService : Service(), Player.EventListener {
     }
 
     private fun configureNotification() {
+
         playerNotificationManager = PlayerNotificationManager.createWithNotificationChannel(
             context,
             "My_channel_id",
-            R.string.nameResourceId,
-            R.string.nameResourceId,
-            R.string.nameResourceId,
+            R.string.ok,
+            R.string.ok,
+            R.string.ok,
             object : MediaDescriptionAdapter {
                 override fun getCurrentSubText(player: Player): String? {
                     return null
@@ -98,6 +102,13 @@ class PodcastPlayerService : Service(), Player.EventListener {
                     if (artwork == null) {
                         loadBitmap()
                     }
+
+                    if (viewModel.currentEpisode == null) {
+
+                        artwork =
+                            BitmapFactory.decodeResource(resources, R.drawable.ic_menu_gallery);
+
+                    }
                     return artwork!!
                 }
 
@@ -110,8 +121,8 @@ class PodcastPlayerService : Service(), Player.EventListener {
                     ongoing: Boolean
                 ) {
                     super.onNotificationPosted(notificationId, notification, ongoing)
-
                     if (viewModel.currentEpisode != null && exoPlayer?.playbackState == Player.STATE_ENDED) {
+
                         preparePlayer(
                             viewModel.currentEpisode!!.url!!,
                             viewModel.currentEpisode!!.currentPosition!!
@@ -121,7 +132,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
                     if (ongoing)
                         startForeground(notificationId, notification);
                     else
-                        stopForeground(false)
+                        stopForeground(true)
                 }
 
                 override fun onNotificationCancelled(
@@ -193,10 +204,10 @@ class PodcastPlayerService : Service(), Player.EventListener {
             play()
         } else if (currentUri == uri && isPlaying())
             pause()
-        else if (currentUri == uri && !isPlaying()){
-            if(position != 0L)
+        else if (currentUri == uri && !isPlaying()) {
+            if (position != 0L)
                 play()
-            else{
+            else {
                 exoPlayer!!.clearMediaItems()
                 //stop()
 
@@ -232,6 +243,7 @@ class PodcastPlayerService : Service(), Player.EventListener {
         stopForeground(true)
 
     }
+
     fun stop() {
         exoPlayer!!.stop()
         stopForeground(true)

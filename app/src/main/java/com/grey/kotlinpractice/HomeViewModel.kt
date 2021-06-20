@@ -79,7 +79,7 @@ class HomeViewModel @Inject constructor(private val savedStateHandle: SavedState
 //        }
     }
 
-    fun getLocalEpisodeList(podId: Int): LiveData<List<Model.Episode>> {
+    fun getLocalEpisodeList(podId: String): LiveData<List<Model.Episode>> {
         repository.episodeLiveList.value = null
         return repository.getEpisodeListLocally(podId)
     }
@@ -113,8 +113,8 @@ class HomeViewModel @Inject constructor(private val savedStateHandle: SavedState
     }
 
 
-    fun getUpdatedPodcastResult(collectionId: String){
-        repository.getUpdatedPodcasts(collectionId)
+    fun getUpdatedPodcastResult(): LiveData<List<Model.Podcast>>{
+        return repository.getUpdatedPodcasts()
     }
 
 

@@ -32,8 +32,15 @@ class HomeFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
     private val viewModel: HomeViewModel by activityViewModels()
 
     lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
+
     interface ItemClickedListener {
-        fun sendPodcastIndex(podId: Int, podcastPosIndex: String, artWork: String, collectionName: String)
+        fun sendPodcastIndex(
+            podId: String,
+            podcastPosIndex: String,
+            artWork: String,
+            collectionName: String
+        )
     }
 
 
@@ -54,49 +61,69 @@ class HomeFragment : Fragment(), SwipeRefreshLayout.OnRefreshListener {
 
         gridView.numColumns = viewModel.homeIconSize
 
-        gridView.setOnItemClickListener{ _, _, position, _ ->
-            SendPodcastFeedUrl( itemList[position].uid, itemList[position].feedUrl, itemList[position].artworkUrl600!!, itemList[position].collectionName!!)
+        gridView.setOnItemClickListener { _, _, position, _ ->
+            SendPodcastFeedUrl(
+                itemList[position].collectionId,
+                itemList[position].feedUrl,
+                itemList[position].artworkUrl600!!,
+                itemList[position].collectionName!!
+            )
         }
 
         swipeRefreshLayout = view.findViewById(R.id.swiperefresh)
         swipeRefreshLayout.setOnRefreshListener(this)
-        val gridObserver = Observer<List<Model.Podcast>> { result ->
+         val gridObserver = Observer<List<Model.Podcast>> { result ->
             // Update the UI
             itemList = result as ArrayList<Model.Podcast>
             sortGridViewDescendingly(viewModel.isSortingDesc)
+
+//            if (swipeRefreshLayout.isRefreshing)
+//                swipeRefreshLayout.isRefreshing = false
         }
         viewModel.getSubscribedPodcasts().observe(viewLifecycleOwner, gridObserver)
 
     }
 
-    fun sortGridViewDescendingly(isDescendingTrue: Boolean){
-        if(itemList != null){
-            if(isDescendingTrue){
-                itemList.sortByDescending {
-                    it.releaseDate
-                }
-            }else{
-                itemList.sortBy {
-                    it.releaseDate
-                }
+    fun sortGridViewDescendingly(isDescendingTrue: Boolean) {
 
+        if (isDescendingTrue) {
+            itemList.sortByDescending {
+                it.releaseDate
             }
-            adapter.updateList(itemList as ArrayList<Model.Podcast>)
+        } else {
+            itemList.sortBy {
+                it.releaseDate
+            }
         }
-
+        adapter.updateList(itemList as ArrayList<Model.Podcast>)
     }
 
     fun setOnItemClickedListener(callback: ItemClickedListener) {
         this.mCallback = callback
     }
 
-    fun SendPodcastFeedUrl(podId: Int, podcastPosIndex: String, artWorkUrl: String, collectionName: String) {
+    fun SendPodcastFeedUrl(
+        podId: String,
+        podcastPosIndex: String,
+        artWorkUrl: String,
+        collectionName: String
+    ) {
         //here you can get the text from the edit text or can use this method according to your need
         mCallback.sendPodcastIndex(podId, podcastPosIndex, artWorkUrl, collectionName)
     }
 
     override fun onRefresh() {
-        if(!itemList.isNullOrEmpty())
-            viewModel.getUpdatedPodcastResult(itemList[0].collectionId)
+        if (!itemList.isNullOrEmpty()){
+            val gridObserver = Observer<List<Model.Podcast>> { result ->
+                // Update the UI
+                itemList = result as ArrayList<Model.Podcast>
+                sortGridViewDescendingly(viewModel.isSortingDesc)
+
+            if (swipeRefreshLayout.isRefreshing)
+                swipeRefreshLayout.isRefreshing = false
+            }
+            viewModel.getUpdatedPodcastResult().observe(viewLifecycleOwner, gridObserver)
+        }
+
     }
 }
